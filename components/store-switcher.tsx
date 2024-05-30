@@ -62,7 +62,7 @@ export default function StoreSwitcher({
           size="sm"
           role="combobox"
           aria-expanded={open}
-          aria-label="Select a store"
+          aria-label="Seleccionar Tienda"
           className={cn("w-[200px] justify-between", className)}
         >
           <Store className="mr-2 h-4 w-4" />
@@ -73,9 +73,9 @@ export default function StoreSwitcher({
       <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandList>
-            <CommandInput placeholder="Search store..." />
+            <CommandInput placeholder="Buscar Tienda..." />
             <CommandEmpty>No se encontro Tienda.</CommandEmpty>
-            <CommandGroup heading="Stores">
+            <CommandGroup heading="Tiendas">
               {formattedItems.map((store) => (
                 <CommandItem
                   key={store.value}
