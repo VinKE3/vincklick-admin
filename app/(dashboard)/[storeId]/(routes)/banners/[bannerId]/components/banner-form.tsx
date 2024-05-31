@@ -160,43 +160,43 @@ export const BannerForm: React.FC<BannerFormProps> = ({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="heading"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Título</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={loading}
+                    placeholder="Título"
+                    {...field}
+                    value={field.value || ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="subHeading"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Subtítulo</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={loading}
+                    placeholder="Subtítulo"
+                    {...field}
+                    value={field.value || ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="md:grid md:grid-cols-3 gap-8">
-            <FormField
-              control={form.control}
-              name="heading"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Título</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Título"
-                      {...field}
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="subHeading"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Subtítulo</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Subtítulo"
-                      {...field}
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="colorId"

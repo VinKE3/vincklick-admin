@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
-import { Billboard, Category } from "@prisma/client";
+import { Attribute } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
@@ -23,31 +23,20 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import ImageUpload from "@/components/ui/image-upload";
 
 const formSchema = z.object({
-  name: z.string().min(2),
-  billboardId: z.string().min(1),
-  imageUrl: z.string().min(1),
+  name: z.string().min(2, { message: "Requerido" }),
+  values: z.object({ valueAttribute: z.string() }).array(),
 });
 
-type CategoryFormValues = z.infer<typeof formSchema>;
+type AttributeFormValues = z.infer<typeof formSchema>;
 
-interface CategoryFormProps {
-  initialData: Category | null;
-  billboards: Billboard[];
+interface AttributeFormProps {
+  initialData: Attribute | null;
 }
 
-export const CategoryForm: React.FC<CategoryFormProps> = ({
+export const AttributeForm: React.FC<AttributeFormProps> = ({
   initialData,
-  billboards,
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -55,40 +44,51 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? "Editar Categoria" : "Crear Categoria";
+  const title = initialData ? "Editar Atributo" : "Crear Atributo";
   const description = initialData
-    ? "Editar una Categoria Existente."
-    : "Añadir Nueva Categoria";
+    ? "Editar un Atributo Existente."
+    : "Agregar Nuevo Atributo";
   const toastMessage = initialData
-    ? "Categoria Actualizada."
-    : "Categoria Creada.";
+    ? "Atributo Actualizado."
+    : "Atributo Creado.";
   const action = initialData ? "Guardar Cambios" : "Crear";
 
-  const form = useForm<CategoryFormValues>({
+  const form = useForm<AttributeFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      name: "",
-      billboardId: "",
-      imageUrl: "",
-    },
+    defaultValues: initialData
+      ? {
+          name: initialData.name,
+          values: initialData.values.map((value) => ({
+            valueAttribute: value,
+          })),
+        }
+      : {
+          name: "",
+          values: [],
+        },
   });
 
-  const onSubmit = async (data: CategoryFormValues) => {
+  const onSubmit = async (data: AttributeFormValues) => {
     try {
       setLoading(true);
+      const transformedData = {
+        ...data,
+        values: data.values.map((value) => value.valueAttribute), // Extraer solo el valor de cada objeto
+      };
       if (initialData) {
         await axios.patch(
-          `/api/${params.storeId}/categories/${params.categoryId}`,
-          data
+          `/api/${params.storeId}/attributes/${params.attributeId}`,
+          transformedData
         );
       } else {
-        await axios.post(`/api/${params.storeId}/categories`, data);
+        await axios.post(`/api/${params.storeId}/attributes`, transformedData);
       }
       router.refresh();
-      router.push(`/${params.storeId}/categories`);
+      router.push(`/${params.storeId}/attributes`);
+      router.refresh();
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error("Algo salió mal. Inténtalo de nuevo");
+      toast.error("Algo Salío mal.");
     } finally {
       setLoading(false);
     }
@@ -98,14 +98,14 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     try {
       setLoading(true);
       await axios.delete(
-        `/api/${params.storeId}/categories/${params.categoryId}`
+        `/api/${params.storeId}/attributes/${params.attributeId}`
       );
       router.refresh();
-      router.push(`/${params.storeId}/categories`);
-      toast.success("Category deleted.");
+      router.push(`/${params.storeId}/attributes`);
+      toast.success("Atributo Eliminado.");
     } catch (error: any) {
       toast.error(
-        "Asegúrese de eliminar todos los productos que utilizan esta categoria."
+        "Asegúrese de eliminar todos los productos que utilizan este Atributo."
       );
     } finally {
       setLoading(false);
@@ -140,24 +140,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Imagen Background</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value ? [field.value] : []}
-                    disabled={loading}
-                    onChange={(url) => field.onChange(url)}
-                    onRemove={() => field.onChange("")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <div className="md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}
@@ -168,7 +150,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Nombre de la categoria"
+                      placeholder="Nombre del Atributo"
                       {...field}
                     />
                   </FormControl>
@@ -178,32 +160,25 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
             />
             <FormField
               control={form.control}
-              name="billboardId"
+              name="values"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Banner</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Seleccionar Banner"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {billboards.map((billboard) => (
-                        <SelectItem key={billboard.id} value={billboard.id}>
-                          {billboard.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Valores</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Nombre del Atributo"
+                      value={field.value
+                        .map((value) => value.valueAttribute)
+                        .join(", ")} // Unir los valores en una cadena separada por comas para mostrar
+                      onChange={(e) => {
+                        const values = e.target.value
+                          .split(",")
+                          .map((value) => ({ valueAttribute: value.trim() }));
+                        field.onChange(values);
+                      }}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
