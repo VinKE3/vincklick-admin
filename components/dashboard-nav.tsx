@@ -71,13 +71,6 @@ export function DashboardNav({
       active: pathname === `/${params.storeId}/attributes`,
     },
     {
-      href: `/${params.storeId}/sizes`,
-      title: "Tamaños",
-      label: "Tamaños",
-      icon: "ruler",
-      active: pathname === `/${params.storeId}/sizes`,
-    },
-    {
       href: `/${params.storeId}/products`,
       title: "Productos",
       label: "Productos",
