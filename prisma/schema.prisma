@@ -15,6 +15,7 @@ model Store {
   banners         Banner[] @relation("StoreToBanner")
   billboards      Billboard[] @relation("StoreToBillboard")
   categories      Category[] @relation("StoreToCategory")
+  subCategories      SubCategory[] @relation("StoreToSubCategory")
   attributes      Attribute[] @relation("StoreToAttribute")
   products        Product[]  @relation("StoreToProduct")
   productsVariant ProductVariant[] @relation("StoreToProductVariant")
@@ -64,6 +65,7 @@ model Category {
   billboardId String      // Foreign Key to Billboard
   billboard   Billboard   @relation(fields: [billboardId], references: [id])
   banners     Banner[]
+  subcategories SubCategory[]
   name        String
   imageUrl    String
   colorId     String?    // Foreign Key to Color
@@ -74,7 +76,20 @@ model Category {
 
   @@index([storeId])
   @@index([colorId]) // Índice en el campo colorId
+  
   @@index([billboardId])
+}
+
+model SubCategory {
+  id          String      @id @default(uuid())
+  storeId     String      // Foreign Key to Store
+  store       Store       @relation("StoreToSubCategory", fields: [storeId], references: [id])
+  categoryId  String   // Foreign Key to Category
+  category    Category @relation(fields: [categoryId], references: [id])
+  name        String
+
+  @@index([storeId])
+  @@index([categoryId])
 }
 
 model Color {
