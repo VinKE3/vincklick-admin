@@ -87,6 +87,8 @@ model SubCategory {
   categoryId  String   // Foreign Key to Category
   category    Category @relation(fields: [categoryId], references: [id])
   name        String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@index([storeId])
   @@index([categoryId])

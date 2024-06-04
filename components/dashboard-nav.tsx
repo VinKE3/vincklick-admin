@@ -57,6 +57,13 @@ export function DashboardNav({
       active: pathname === `/${params.storeId}/categories`,
     },
     {
+      href: `/${params.storeId}/subCategories`,
+      title: "SubCategorias",
+      label: "SubCategorias",
+      icon: "copyPlus",
+      active: pathname === `/${params.storeId}/subCategories`,
+    },
+    {
       href: `/${params.storeId}/banners`,
       title: "Banner Principal",
       label: "Banner Principal",

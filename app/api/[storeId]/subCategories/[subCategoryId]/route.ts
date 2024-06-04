@@ -5,33 +5,29 @@ import prismadb from "@/lib/prismadb";
 
 export async function GET(
   req: Request,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: { subCategoryId: string } }
 ) {
   try {
-    if (!params.categoryId) {
+    if (!params.subCategoryId) {
       return new NextResponse("Category id is required", { status: 400 });
     }
 
-    const category = await prismadb.category.findUnique({
+    const subCategory = await prismadb.subCategory.findUnique({
       where: {
-        id: params.categoryId,
-      },
-      include: {
-        billboard: true,
-        subcategories: true,
+        id: params.subCategoryId,
       },
     });
 
-    return NextResponse.json(category);
+    return NextResponse.json(subCategory);
   } catch (error) {
-    console.log("[CATEGORY_GET]", error);
+    console.log("[SUBCATEGORY_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { categoryId: string; storeId: string } }
+  { params }: { params: { subCategoryId: string; storeId: string } }
 ) {
   try {
     const { userId } = auth();
@@ -40,8 +36,8 @@ export async function DELETE(
       return new NextResponse("Unauthenticated", { status: 403 });
     }
 
-    if (!params.categoryId) {
-      return new NextResponse("Category id is required", { status: 400 });
+    if (!params.subCategoryId) {
+      return new NextResponse("SubCategory id is required", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -55,47 +51,44 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const category = await prismadb.category.delete({
+    const subCategory = await prismadb.subCategory.delete({
       where: {
-        id: params.categoryId,
+        id: params.subCategoryId,
       },
     });
 
-    return NextResponse.json(category);
+    return NextResponse.json(subCategory);
   } catch (error) {
-    console.log("[CATEGORY_DELETE]", error);
+    console.log("[SUBCATEGORY_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { categoryId: string; storeId: string } }
+  { params }: { params: { subCategoryId: string; storeId: string } }
 ) {
   try {
     const { userId } = auth();
 
     const body = await req.json();
 
-    const { name, billboardId, imageUrl } = body;
+    const { name, categoryId } = body;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
     }
 
-    if (!billboardId) {
+    if (!categoryId) {
       return new NextResponse("Billboard ID is required", { status: 400 });
     }
 
     if (!name) {
       return new NextResponse("Name is required", { status: 400 });
     }
-    if (!imageUrl) {
-      return new NextResponse("Imagen es requerida", { status: 400 });
-    }
 
-    if (!params.categoryId) {
-      return new NextResponse("Category id is required", { status: 400 });
+    if (!params.subCategoryId) {
+      return new NextResponse("Subcategoria id is required", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -109,20 +102,19 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const category = await prismadb.category.update({
+    const subCategory = await prismadb.subCategory.update({
       where: {
-        id: params.categoryId,
+        id: params.subCategoryId,
       },
       data: {
         name,
-        billboardId,
-        imageUrl,
+        categoryId,
       },
     });
 
-    return NextResponse.json(category);
+    return NextResponse.json(subCategory);
   } catch (error) {
-    console.log("[CATEGORY_PATCH]", error);
+    console.log("[SUBCATEGORY_PATCH]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

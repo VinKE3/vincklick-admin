@@ -12,6 +12,14 @@ const CategoriesPage = async ({ params }: { params: { storeId: string } }) => {
     },
     include: {
       billboard: true,
+      subcategories: {
+        // Cargamos subcategorías en una sola consulta
+        select: {
+          // Solo seleccionamos los campos necesarios de las subcategorías
+          id: true,
+          name: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -22,6 +30,7 @@ const CategoriesPage = async ({ params }: { params: { storeId: string } }) => {
     id: item.id,
     name: item.name,
     billboardLabel: item.billboard.label,
+    subCategories: item.subcategories.map((sub) => sub.name), // Array de nombres de subcategorías
     createdAt: format(item.createdAt, "dd-MM-yyyy"),
   }));
 
