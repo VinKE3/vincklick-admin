@@ -25,8 +25,15 @@ import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Requerido" }),
-  values: z.object({ valueAttribute: z.string() }).array(),
+  name: z.string().min(1, { message: "Requerido" }),
+  values: z
+    .object({
+      valueAttribute: z.string(),
+    })
+    .array()
+    .min(1, {
+      message: "Requerido",
+    }),
 });
 
 type AttributeFormValues = z.infer<typeof formSchema>;

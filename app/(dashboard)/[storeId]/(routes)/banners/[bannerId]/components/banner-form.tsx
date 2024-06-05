@@ -32,12 +32,18 @@ import ImageUpload from "@/components/ui/image-upload";
 import { Color, Banner, Category } from "@prisma/client";
 
 const formSchema = z.object({
-  heading: z.string().min(1),
+  heading: z.string().min(1, {
+    message: "Requerido",
+  }),
   subHeading: z.string().optional().nullable(),
   btnText: z.string().optional().nullable(),
-  imageUrl: z.string().min(1),
+  imageUrl: z.string().min(1, {
+    message: "Requerido",
+  }),
   colorId: z.string().optional().nullable(),
-  categoryId: z.string().min(1),
+  categoryId: z.string().min(1, {
+    message: "Requerido",
+  }),
 });
 
 type BannerFormValues = z.infer<typeof formSchema>;

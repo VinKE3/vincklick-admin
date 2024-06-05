@@ -102,6 +102,7 @@ model Color {
   value       String
   banners     Banner[]
   categories  Category[]
+  productVariants ProductVariant[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -153,11 +154,14 @@ model ProductVariant {
   sku          String    // Código único de la variante (opcional)
   price        Decimal?
   stock        Decimal?
+  colorId      String?    // Foreign Key to Color
+  color        Color?  @relation(fields: [colorId], references: [id])
   attributes   Attribute[]
   images       Image[] 
 
   @@index([productId])
   @@index([storeId])
+  @@index([colorId])
 }
 
 model Image {
@@ -174,8 +178,6 @@ model Image {
   @@index([productVariantId])
 }
 
-
-
 model Order {
   id          String    @id @default(uuid())
   storeId     String    // Foreign Key to Store
@@ -190,7 +192,6 @@ model Order {
   @@index([storeId])
 }
 
-// Intermediary for a many-to-many relationship
 model OrderItem {
   id        String  @id @default(uuid())
   orderId   String  // Foreign Key to Order

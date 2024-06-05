@@ -33,9 +33,15 @@ import {
 import ImageUpload from "@/components/ui/image-upload";
 
 const formSchema = z.object({
-  name: z.string().min(2),
-  billboardId: z.string().min(1),
-  imageUrl: z.string().min(1),
+  name: z.string().min(1, {
+    message: "Requerido",
+  }),
+  billboardId: z.string().min(1, {
+    message: "Requerido",
+  }),
+  imageUrl: z.string().min(1, {
+    message: "Requerido",
+  }),
 });
 
 type CategoryFormValues = z.infer<typeof formSchema>;

@@ -26,9 +26,15 @@ import { AlertModal } from "@/components/modals/alert-modal";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Requerido" }),
-  value: z.string().min(4).max(9).regex(/^#/, {
-    message: "La cadena debe ser un código hexadecimal válido",
-  }),
+  value: z
+    .string()
+    .min(4, {
+      message: "La cadena debe ser un código hexadecimal válido",
+    })
+    .max(9)
+    .regex(/^#/, {
+      message: "La cadena debe ser un código hexadecimal válido",
+    }),
 });
 
 type ColorFormValues = z.infer<typeof formSchema>;

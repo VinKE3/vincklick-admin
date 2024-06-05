@@ -30,7 +30,7 @@ const CategoriesPage = async ({ params }: { params: { storeId: string } }) => {
     id: item.id,
     name: item.name,
     billboardLabel: item.billboard.label,
-    subCategories: item.subcategories.map((sub) => sub.name), // Array de nombres de subcategorías
+    subCategories: item.subcategories, // Array de nombres de subcategorías
     createdAt: format(item.createdAt, "dd-MM-yyyy"),
   }));
 
