@@ -12,10 +12,12 @@ model Store {
   id              String    @id @default(uuid())
   name            String
   userId          String
+  providers       Provider[] @relation("StoreToProvider")
   banners         Banner[] @relation("StoreToBanner")
   billboards      Billboard[] @relation("StoreToBillboard")
+  brands          Brand[] @relation("StoreToBrand")
   categories      Category[] @relation("StoreToCategory")
-  subCategories      SubCategory[] @relation("StoreToSubCategory")
+  subCategories   SubCategory[] @relation("StoreToSubCategory")
   attributes      Attribute[] @relation("StoreToAttribute")
   products        Product[]  @relation("StoreToProduct")
   productsVariant ProductVariant[] @relation("StoreToProductVariant")
@@ -25,6 +27,19 @@ model Store {
   updatedAt       DateTime   @updatedAt
 }
 
+model Provider {
+  id          String @id @default(uuid())
+  storeId     String
+  store       Store @relation("StoreToProvider", fields: [storeId], references: [id])
+  name        String
+  phone       String
+  cuit        String
+  address     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([storeId])
+}
 model Banner {
   id          String @id @default(uuid())
   storeId     String
@@ -108,6 +123,17 @@ model Color {
 
   @@index([storeId])
 }
+model Brand {
+  id          String   @id @default(uuid())
+  storeId     String   // Foreign Key to Store
+  store       Store    @relation("StoreToBrand", fields: [storeId], references: [id])
+  name        String
+  imageUrl    String
+  product     Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@index([storeId])
+}
 
 model Product {
   id          String    @id @default(uuid())
@@ -122,12 +148,15 @@ model Product {
   isFeatured  Boolean   @default(false)
   isArchived  Boolean   @default(false)
   variants    ProductVariant[]
+  brandId     String
+  brand       Brand  @relation(fields: [brandId], references: [id])
   orderItems  OrderItem[]   // Relation to Order model
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([storeId])
   @@index([categoryId])
+  @@index([brandId])
 }
 
 model Attribute {
