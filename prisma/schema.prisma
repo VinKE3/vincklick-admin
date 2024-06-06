@@ -32,9 +32,11 @@ model Provider {
   storeId     String
   store       Store @relation("StoreToProvider", fields: [storeId], references: [id])
   name        String
-  phone       String
-  cuit        String
-  address     String
+  contactName String?
+  email       String?   @unique
+  phone       String?
+  address     String?
+  products    Product[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -123,6 +125,7 @@ model Color {
 
   @@index([storeId])
 }
+
 model Brand {
   id          String   @id @default(uuid())
   storeId     String   // Foreign Key to Store
@@ -150,6 +153,8 @@ model Product {
   variants    ProductVariant[]
   brandId     String
   brand       Brand  @relation(fields: [brandId], references: [id])
+  providerId  String
+  provider    Provider @relation(fields: [providerId], references: [id])
   orderItems  OrderItem[]   // Relation to Order model
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -157,6 +162,7 @@ model Product {
   @@index([storeId])
   @@index([categoryId])
   @@index([brandId])
+  @@index([providerId])
 }
 
 model Attribute {
