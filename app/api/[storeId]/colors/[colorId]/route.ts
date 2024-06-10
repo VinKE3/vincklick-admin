@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     if (!params.colorId) {
-      return new NextResponse("Color id is required", { status: 400 });
+      return new NextResponse("Id del color es requerido", { status: 400 });
     }
 
     const color = await prismadb.color.findUnique({
@@ -33,11 +33,11 @@ export async function DELETE(
     const { userId } = auth();
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 403 });
+      return new NextResponse("No autorizado", { status: 403 });
     }
 
     if (!params.colorId) {
-      return new NextResponse("Color id is required", { status: 400 });
+      return new NextResponse("Id del color es requerido", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -48,7 +48,7 @@ export async function DELETE(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const color = await prismadb.color.delete({
@@ -76,19 +76,19 @@ export async function PATCH(
     const { name, value } = body;
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 403 });
+      return new NextResponse("No autorizado", { status: 403 });
     }
 
     if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
+      return new NextResponse("Nombre es requerido", { status: 400 });
     }
 
     if (!value) {
-      return new NextResponse("Value is required", { status: 400 });
+      return new NextResponse("Valor es requerido", { status: 400 });
     }
 
     if (!params.colorId) {
-      return new NextResponse("Color id is required", { status: 400 });
+      return new NextResponse("Id del color es requerido", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -99,7 +99,7 @@ export async function PATCH(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const color = await prismadb.color.update({

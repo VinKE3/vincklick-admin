@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     if (!params.bannerId) {
-      return new NextResponse("Banner id es requerido", { status: 400 });
+      return new NextResponse("Id del banner es requerido", { status: 400 });
     }
 
     const banner = await prismadb.banner.findUnique({
@@ -33,11 +33,11 @@ export async function DELETE(
     const { userId } = auth();
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 403 });
+      return new NextResponse("No autorizado", { status: 403 });
     }
 
     if (!params.bannerId) {
-      return new NextResponse("Billboard id is required", { status: 400 });
+      return new NextResponse("Id del banner es requerido", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -48,7 +48,7 @@ export async function DELETE(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const banner = await prismadb.banner.delete({
@@ -85,15 +85,15 @@ export async function PATCH(
     } = body;
 
     if (!userId) {
-      return new NextResponse("No autentificado", { status: 403 });
+      return new NextResponse("No autorizado", { status: 403 });
     }
 
     if (!params.storeId) {
-      return new NextResponse("Store id es requerido", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
     }
 
     if (!heading) {
-      return new NextResponse("heading es requerido", { status: 400 });
+      return new NextResponse("Cabecera es requerido", { status: 400 });
     }
 
     if (!imageUrl) {
@@ -110,7 +110,7 @@ export async function PATCH(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const banner = await prismadb.banner.update({

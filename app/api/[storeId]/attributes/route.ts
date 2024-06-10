@@ -15,11 +15,11 @@ export async function POST(
     const { name, values } = body;
 
     if (!userId) {
-      return new NextResponse("No autentificado", { status: 403 });
+      return new NextResponse("No autorizado", { status: 403 });
     }
 
     if (!params.storeId) {
-      return new NextResponse("Store id es requerido", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
     }
 
     if (!name) {
@@ -40,7 +40,7 @@ export async function POST(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const attribute = await prismadb.attribute.create({
@@ -64,7 +64,7 @@ export async function GET(
 ) {
   try {
     if (!params.storeId) {
-      return new NextResponse("Store id is required", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
     }
 
     const attributes = await prismadb.attribute.findMany({

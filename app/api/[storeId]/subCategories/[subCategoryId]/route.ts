@@ -9,7 +9,9 @@ export async function GET(
 ) {
   try {
     if (!params.subCategoryId) {
-      return new NextResponse("Category id is required", { status: 400 });
+      return new NextResponse("Id de la categoría es requerido", {
+        status: 400,
+      });
     }
 
     const subCategory = await prismadb.subCategory.findUnique({
@@ -33,11 +35,13 @@ export async function DELETE(
     const { userId } = auth();
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 403 });
+      return new NextResponse("No identificado", { status: 403 });
     }
 
     if (!params.subCategoryId) {
-      return new NextResponse("SubCategory id is required", { status: 400 });
+      return new NextResponse("Id de la subcategoría es requerido", {
+        status: 400,
+      });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -48,7 +52,7 @@ export async function DELETE(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const subCategory = await prismadb.subCategory.delete({
@@ -76,19 +80,23 @@ export async function PATCH(
     const { name, categoryId } = body;
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 403 });
+      return new NextResponse("No identificado", { status: 403 });
     }
 
     if (!categoryId) {
-      return new NextResponse("Billboard ID is required", { status: 400 });
+      return new NextResponse("Id de la categoría es requerido", {
+        status: 400,
+      });
     }
 
     if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
+      return new NextResponse("Nombre es requerido", { status: 400 });
     }
 
     if (!params.subCategoryId) {
-      return new NextResponse("Subcategoria id is required", { status: 400 });
+      return new NextResponse("Id de la Subcategoría es requerido", {
+        status: 400,
+      });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -99,7 +107,7 @@ export async function PATCH(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const subCategory = await prismadb.subCategory.update({

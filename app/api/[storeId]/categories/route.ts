@@ -15,23 +15,25 @@ export async function POST(
     const { name, billboardId, imageUrl } = body;
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 403 });
+      return new NextResponse("No identificado", { status: 403 });
     }
 
     if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
+      return new NextResponse("Nombre es requerido", { status: 400 });
     }
 
     if (!imageUrl) {
-      return new NextResponse("Name is required", { status: 400 });
+      return new NextResponse("URL de la Imágen es requerid", { status: 400 });
     }
 
     if (!billboardId) {
-      return new NextResponse("Billboard ID is required", { status: 400 });
+      return new NextResponse("Id del banner de categoría requerido", {
+        status: 400,
+      });
     }
 
     if (!params.storeId) {
-      return new NextResponse("Store id is required", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -42,7 +44,7 @@ export async function POST(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const category = await prismadb.category.create({
@@ -67,7 +69,7 @@ export async function GET(
 ) {
   try {
     if (!params.storeId) {
-      return new NextResponse("Store id is required", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
     }
 
     const categories = await prismadb.category.findMany({

@@ -5,39 +5,37 @@ import prismadb from "@/lib/prismadb";
 
 export async function GET(
   req: Request,
-  { params }: { params: { attributeId: string } }
+  { params }: { params: { providerId: string } }
 ) {
   try {
-    if (!params.attributeId) {
-      return new NextResponse("Id del atributo es requerido", { status: 400 });
+    if (!params.providerId) {
+      return new NextResponse("Id del Proveedor es requerido", { status: 400 });
     }
-
-    const attribute = await prismadb.attribute.findUnique({
+    const provider = await prismadb.provider.findUnique({
       where: {
-        id: params.attributeId,
+        id: params.providerId,
       },
     });
 
-    return NextResponse.json(attribute);
+    return NextResponse.json(provider);
   } catch (error) {
-    console.log("[ATTRIBUTE_GET]", error);
+    console.log("[PROVIDER_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { attributeId: string; storeId: string } }
+  { params }: { params: { providerId: string; storeId: string } }
 ) {
   try {
     const { userId } = auth();
-
     if (!userId) {
       return new NextResponse("No autorizado", { status: 403 });
     }
 
-    if (!params.attributeId) {
-      return new NextResponse("Id del atributo es requerido", { status: 400 });
+    if (!params.providerId) {
+      return new NextResponse("Id del proveedor es requerido", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -50,47 +48,40 @@ export async function DELETE(
     if (!storeByUserId) {
       return new NextResponse("No autorizado", { status: 405 });
     }
-
-    const attribute = await prismadb.attribute.delete({
+    const provider = await prismadb.provider.delete({
       where: {
-        id: params.attributeId,
+        id: params.providerId,
       },
     });
 
-    return NextResponse.json(attribute);
+    return NextResponse.json(provider);
   } catch (error) {
-    console.log("[ATTRIBUTE_DELETE]", error);
+    console.log("[PROVIDER_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { attributeId: string; storeId: string } }
+  { params }: { params: { providerId: string; storeId: string } }
 ) {
   try {
     const { userId } = auth();
 
     const body = await req.json();
 
-    const { name, values } = body;
+    const { name, contactName, email, phone, address } = body;
 
     if (!userId) {
       return new NextResponse("No autorizado", { status: 403 });
     }
 
-    if (!params.storeId) {
-      return new NextResponse("Id de la tienda es requerido", { status: 400 });
+    if (!params.providerId) {
+      return new NextResponse("Id del color es requerido", { status: 400 });
     }
 
     if (!name) {
       return new NextResponse("Nombre es requerido", { status: 400 });
-    }
-
-    if (!values) {
-      return new NextResponse("Valores son requeridos", {
-        status: 400,
-      });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -104,19 +95,21 @@ export async function PATCH(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
-    const attribute = await prismadb.attribute.update({
+    const provider = await prismadb.provider.update({
       where: {
-        id: params.attributeId,
+        id: params.providerId,
       },
       data: {
         name,
-        values,
+        contactName,
+        email,
+        phone,
+        address,
       },
     });
 
-    return NextResponse.json(attribute);
+    return NextResponse.json(provider);
   } catch (error) {
-    console.log("[BANNER_PATCH]", error);
-    return new NextResponse("Internal error", { status: 500 });
+    console.log(error);
   }
 }

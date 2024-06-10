@@ -27,7 +27,7 @@ export async function POST(
     }
 
     if (!params.storeId) {
-      return new NextResponse("Id de la tienda es requerida", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -38,7 +38,7 @@ export async function POST(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const subCategory = await prismadb.subCategory.create({
@@ -62,7 +62,7 @@ export async function GET(
 ) {
   try {
     if (!params.storeId) {
-      return new NextResponse("Store id is required", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
     }
 
     const subCategories = await prismadb.subCategory.findMany({

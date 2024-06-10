@@ -15,19 +15,24 @@ export async function POST(
     const { name, value } = body;
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 403 });
+      return new NextResponse("No autentificado", { status: 403 });
+    }
+    if (!params.storeId) {
+      return new NextResponse("Id de la tienda es requerido", {
+        status: 400,
+      });
     }
 
     if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
+      return new NextResponse("Nombre es requerido", { status: 400 });
     }
 
     if (!value) {
-      return new NextResponse("Value is required", { status: 400 });
+      return new NextResponse("Valor es requerido", { status: 400 });
     }
 
     if (!params.storeId) {
-      return new NextResponse("Store id is required", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -38,7 +43,7 @@ export async function POST(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const color = await prismadb.color.create({
@@ -62,7 +67,7 @@ export async function GET(
 ) {
   try {
     if (!params.storeId) {
-      return new NextResponse("Store id is required", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
     }
 
     const colors = await prismadb.color.findMany({
