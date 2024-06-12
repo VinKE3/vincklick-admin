@@ -23,6 +23,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
+import { SketchPicker } from "react-color";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Requerido" }),
@@ -64,6 +65,15 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
       value: "#",
     },
   });
+
+  const [selectedColor, setSelectedColor] = useState<string>(
+    initialData?.value || "#"
+  ); // Color picker state
+
+  const handleColorChange = (color: { hex: string }) => {
+    setSelectedColor(color.hex); // Update the selected color
+    form.setValue("value", color.hex); // Update the form value
+  };
 
   const onSubmit = async (data: ColorFormValues) => {
     try {
@@ -165,6 +175,24 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
                       <div
                         className="border p-4 rounded-full"
                         style={{ backgroundColor: field.value }}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Selector</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-x-4">
+                      <SketchPicker
+                        color={selectedColor}
+                        onChangeComplete={handleColorChange}
                       />
                     </div>
                   </FormControl>

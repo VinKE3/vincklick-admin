@@ -36,6 +36,13 @@ export function DashboardNav({
       active: pathname === `/${params.storeId}`,
     },
     {
+      href: `/${params.storeId}/providers`,
+      title: "Proveedores",
+      label: "Proveedores",
+      icon: "user",
+      active: pathname === `/${params.storeId}/providers`,
+    },
+    {
       href: `/${params.storeId}/colors`,
       title: "Colores Tienda",
       label: "Colores Tienda",
@@ -44,8 +51,8 @@ export function DashboardNav({
     },
     {
       href: `/${params.storeId}/billboards`,
-      title: "Banners Categorías",
-      label: "Banners Categorías",
+      title: "Banners",
+      label: "Banners",
       icon: "galleryVertical",
       active: pathname === `/${params.storeId}/billboards`,
     },
@@ -60,8 +67,15 @@ export function DashboardNav({
       href: `/${params.storeId}/subCategories`,
       title: "SubCategorias",
       label: "SubCategorias",
-      icon: "copyPlus",
+      icon: "layers",
       active: pathname === `/${params.storeId}/subCategories`,
+    },
+    {
+      href: `/${params.storeId}/brands`,
+      title: "Marcas",
+      label: "Marcas",
+      icon: "dices",
+      active: pathname === `/${params.storeId}/brands`,
     },
     {
       href: `/${params.storeId}/banners`,

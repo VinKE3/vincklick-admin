@@ -16,10 +16,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AlertModal } from "@/components/modals/alert-modal";
 
-import { BillboardColumn } from "./columns";
+import { ProviderColumn } from "./columns";
 
 interface CellActionProps {
-  data: BillboardColumn;
+  data: ProviderColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -31,12 +31,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onConfirm = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/billboards/${data.id}`);
-      toast.success("Billboard Eliminado.");
+      await axios.delete(`/api/${params.storeId}/providers/${data.id}`);
+      toast.success("Proveedor Eliminado.");
       router.refresh();
     } catch (error) {
       toast.error(
-        "Asegúrese de eliminar las categorias que utilizan este Banner."
+        "Asegúrese de eliminar las categorias que utilizan este Proveedor."
       );
     } finally {
       setOpen(false);
@@ -46,7 +46,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Billboard ID copiado.");
+    toast.success("Proveedor ID copiado.");
   };
 
   return (
@@ -71,7 +71,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
-              router.push(`/${params.storeId}/billboards/${data.id}`)
+              router.push(`/${params.storeId}/providers/${data.id}`)
             }
           >
             <Edit className="mr-2 h-4 w-4" /> Editar
