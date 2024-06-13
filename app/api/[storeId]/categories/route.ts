@@ -12,7 +12,7 @@ export async function POST(
 
     const body = await req.json();
 
-    const { name, billboardId, imageUrl } = body;
+    const { name, billboardId, imageUrl, colorId } = body;
 
     if (!userId) {
       return new NextResponse("No identificado", { status: 403 });
@@ -52,6 +52,7 @@ export async function POST(
         name,
         billboardId,
         imageUrl,
+        colorId,
         storeId: params.storeId,
       },
     });
