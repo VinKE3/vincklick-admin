@@ -75,6 +75,7 @@ export const BrandForm: React.FC<BrandFormProps> = ({ initialData }) => {
       }
       router.refresh();
       router.push(`/${params.storeId}/brands`);
+      router.refresh();
       toast.success(toastMessage);
     } catch (error: any) {
       toast.error("Algo salió mal. Inténtalo de nuevo");
@@ -152,7 +153,7 @@ export const BrandForm: React.FC<BrandFormProps> = ({ initialData }) => {
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Nombre Banner"
+                      placeholder="Nombre Marca"
                       {...field}
                     />
                   </FormControl>
