@@ -42,6 +42,9 @@ const formSchema = z.object({
   categoryId: z.string().min(1),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
+  variants: z.object({ variant: z.string() }).array().optional(),
+  brandId: z.string().min(1),
+  providerId: z.string().min(1),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
