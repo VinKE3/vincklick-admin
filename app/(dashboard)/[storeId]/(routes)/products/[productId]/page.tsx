@@ -13,10 +13,33 @@ const ProductPage = async ({
     },
     include: {
       images: true,
+      variants: true,
     },
   });
 
   const categories = await prismadb.category.findMany({
+    where: {
+      storeId: params.storeId,
+    },
+    include: {
+      subcategories: true,
+      banners: true,
+    },
+  });
+
+  const subCategories = await prismadb.subCategory.findMany({
+    where: {
+      storeId: params.storeId,
+    },
+  });
+
+  const brands = await prismadb.brand.findMany({
+    where: {
+      storeId: params.storeId,
+    },
+  });
+
+  const provider = await prismadb.provider.findMany({
     where: {
       storeId: params.storeId,
     },
@@ -25,7 +48,11 @@ const ProductPage = async ({
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <ProductForm categories={categories} initialData={product} />
+        <ProductForm
+          categories={categories}
+          subCategories={subCategories}
+          initialData={product}
+        />
       </div>
     </div>
   );

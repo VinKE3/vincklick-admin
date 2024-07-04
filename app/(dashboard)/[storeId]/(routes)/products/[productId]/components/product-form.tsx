@@ -7,7 +7,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
-import { Category, Color, Image, Product } from "@prisma/client";
+import {
+  Category,
+  Color,
+  Image,
+  Product,
+  SubCategory,
+  Brand,
+  Provider,
+} from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
@@ -40,6 +48,7 @@ const formSchema = z.object({
   price: z.coerce.number().min(1),
   stock: z.coerce.number().min(1).optional(),
   categoryId: z.string().min(1),
+  subCategoryId: z.string().min(1).optional(),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
   variants: z.object({ variant: z.string() }).array().optional(),
@@ -56,6 +65,7 @@ interface ProductFormProps {
       })
     | null;
   categories: Category[];
+  subCategories: SubCategory[];
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -64,6 +74,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 }) => {
   const params = useParams();
   const router = useRouter();
+  console.log(categories[0], "hola");
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);

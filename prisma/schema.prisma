@@ -104,6 +104,7 @@ model SubCategory {
   categoryId  String   // Foreign Key to Category
   category    Category @relation(fields: [categoryId], references: [id])
   name        String
+  products    Product[]   @relation("SubCategoryToProduct")
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -144,6 +145,8 @@ model Product {
   store       Store     @relation("StoreToProduct", fields: [storeId], references: [id])
   categoryId  String    // Foreign Key to Category
   category    Category  @relation("CategoryToProduct", fields: [categoryId], references: [id])
+  subCategoryId String?
+  subCategory SubCategory? @relation("SubCategoryToProduct", fields: [subCategoryId], references: [id]) 
   name        String
   price       Decimal   
   stock       Decimal?
@@ -161,6 +164,7 @@ model Product {
 
   @@index([storeId])
   @@index([categoryId])
+  @@index([subCategoryId])
   @@index([brandId])
   @@index([providerId])
 }
