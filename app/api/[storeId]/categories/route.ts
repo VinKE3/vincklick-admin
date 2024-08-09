@@ -77,6 +77,10 @@ export async function GET(
       where: {
         storeId: params.storeId,
       },
+      include: {
+        banners: true,
+        subcategories: true,
+      },
     });
 
     return NextResponse.json(categories);
