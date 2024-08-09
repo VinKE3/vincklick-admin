@@ -23,7 +23,6 @@ const ProductPage = async ({
     },
     include: {
       subcategories: true,
-      banners: true,
     },
   });
 
@@ -39,7 +38,7 @@ const ProductPage = async ({
     },
   });
 
-  const provider = await prismadb.provider.findMany({
+  const providers = await prismadb.provider.findMany({
     where: {
       storeId: params.storeId,
     },
@@ -51,6 +50,8 @@ const ProductPage = async ({
         <ProductForm
           categories={categories}
           subCategories={subCategories}
+          brands={brands}
+          providers={providers}
           initialData={product}
         />
       </div>

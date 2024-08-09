@@ -2,7 +2,7 @@
 
 import * as z from "zod";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -48,12 +48,12 @@ const formSchema = z.object({
   price: z.coerce.number().min(1),
   stock: z.coerce.number().min(1).optional(),
   categoryId: z.string().min(1),
-  subCategoryId: z.string().min(1).optional(),
+  subCategoryId: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
   variants: z.object({ variant: z.string() }).array().optional(),
-  brandId: z.string().min(1),
-  providerId: z.string().min(1),
+  brandId: z.string().optional().nullable(),
+  providerId: z.string().optional().nullable(),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -66,15 +66,19 @@ interface ProductFormProps {
     | null;
   categories: Category[];
   subCategories: SubCategory[];
+  brands: Brand[];
+  providers: Provider[];
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
   initialData,
   categories,
+  subCategories,
+  brands,
+  providers,
 }) => {
   const params = useParams();
   const router = useRouter();
-  console.log(categories[0], "hola");
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -100,6 +104,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         price: 0,
         stock: 1,
         categoryId: "",
+        subCategoryId: "",
+        brandId: "",
+        providerId: "",
         colorId: "",
         sizeId: "",
         isFeatured: false,
@@ -110,6 +117,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+
+  // Filtrar subcategorías según la categoría seleccionada
+  const filteredSubCategories = subCategories.filter(
+    (subCategory) => subCategory.categoryId === selectedCategoryId
+  );
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
@@ -252,15 +265,19 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="categoryId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Categoria</FormLabel>
+                  <FormLabel>Categoría</FormLabel>
                   <Select
                     disabled={loading}
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setSelectedCategoryId(value); // Actualiza el estado con la categoría seleccionada
+                    }}
                     value={field.value}
                     defaultValue={field.value}
                   >
@@ -268,7 +285,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       <SelectTrigger>
                         <SelectValue
                           defaultValue={field.value}
-                          placeholder="Seleccionar Categoria"
+                          placeholder="Seleccionar Categoría"
                         />
                       </SelectTrigger>
                     </FormControl>
@@ -284,24 +301,111 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+
+            {/* Select para Subcategoría */}
             <FormField
               control={form.control}
-              name="isFeatured"
+              name="subCategoryId"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      // @ts-ignore
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Destacado</FormLabel>
-                    <FormDescription>
-                      Este producto aparecerá en la sección de destacados.
-                    </FormDescription>
-                  </div>
+                <FormItem>
+                  <FormLabel>Subcategoría</FormLabel>
+                  <Select
+                    disabled={loading || !selectedCategoryId}
+                    onValueChange={field.onChange}
+                    value={field.value || ""}
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value || ""}
+                          placeholder="Seleccionar Subcategoría"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {filteredSubCategories.length > 0 ? (
+                        filteredSubCategories.map((subCategory) => (
+                          <SelectItem
+                            key={subCategory.id}
+                            value={subCategory.id} // Asegúrate de que este valor no sea vacío
+                          >
+                            {subCategory.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        // No incluir un SelectItem con valor vacío
+                        <div className="text-center p-2 text-gray-500">
+                          No hay subcategorías disponibles
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="brandId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Marca</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value || ""}
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value || ""}
+                          placeholder="Seleccionar Marca"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {brands?.map((brand) => (
+                        <SelectItem key={brand.id} value={brand.id}>
+                          {brand.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="providerId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Proveedor</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value || ""}
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value || ""}
+                          placeholder="Seleccionar Proveedor"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {providers?.map((provider) => (
+                        <SelectItem key={provider.id} value={provider.id}>
+                          {provider.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
                 </FormItem>
               )}
             />

@@ -154,10 +154,10 @@ model Product {
   isFeatured  Boolean   @default(false)
   isArchived  Boolean   @default(false)
   variants    ProductVariant[]
-  brandId     String
-  brand       Brand  @relation(fields: [brandId], references: [id])
-  providerId  String
-  provider    Provider @relation(fields: [providerId], references: [id])
+  brandId     String?
+  brand       Brand?  @relation(fields: [brandId], references: [id])
+  providerId  String?
+  provider    Provider? @relation(fields: [providerId], references: [id])
   orderItems  OrderItem[]   // Relation to Order model
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
