@@ -7,15 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
-import {
-  Category,
-  Color,
-  Image,
-  Product,
-  SubCategory,
-  Brand,
-  Provider,
-} from "@prisma/client";
+import { Image, Product, Brand, Provider } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
@@ -43,11 +35,14 @@ import ImageUpload from "@/components/ui/image-upload";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
-  name: z.string().min(1),
-  images: z.object({ url: z.string() }).array(),
-  price: z.coerce.number().min(1),
+  name: z.string().min(1, { message: "Requerido" }),
+  images: z
+    .object({ url: z.string() }, { message: "Requerido" })
+    .array()
+    .min(1, { message: "Requerido" }),
+  price: z.coerce.number().min(1, { message: "Requerido" }),
   stock: z.coerce.number().min(1).optional(),
-  categoryId: z.string().min(1),
+  categoryId: z.string().min(1, { message: "Requerido" }),
   subCategoryId: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
@@ -58,13 +53,34 @@ const formSchema = z.object({
 
 type ProductFormValues = z.infer<typeof formSchema>;
 
+interface SubCategory {
+  id: string;
+  storeId: string;
+  categoryId: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface CategoriaTest {
+  id: string;
+  storeId: string;
+  billboardId: string;
+  subcategories: SubCategory[];
+  name: string;
+  imageUrl: string;
+  colorId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface ProductFormProps {
   initialData:
     | (Product & {
         images: Image[];
       })
     | null;
-  categories: Category[];
+  categories: CategoriaTest[];
   subCategories: SubCategory[];
   brands: Brand[];
   providers: Provider[];
@@ -73,7 +89,6 @@ interface ProductFormProps {
 export const ProductForm: React.FC<ProductFormProps> = ({
   initialData,
   categories,
-  subCategories,
   brands,
   providers,
 }) => {
@@ -97,6 +112,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         ...initialData,
         price: parseFloat(String(initialData?.price)),
         stock: parseFloat(String(initialData?.price)),
+        categoryId: initialData.categoryId || "",
+        subCategoryId: initialData.subCategoryId || "", // Asegúrate de que subCategoryId esté correctamente inicializado
       }
     : {
         name: "",
@@ -117,12 +134,16 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState(
+    initialData?.categoryId || ""
+  );
 
   // Filtrar subcategorías según la categoría seleccionada
-  const filteredSubCategories = subCategories.filter(
-    (subCategory) => subCategory.categoryId === selectedCategoryId
-  );
+  const filteredSubCategories =
+    categories.find((category) => category.id === selectedCategoryId)
+      ?.subcategories || [];
+
+  const isSubCategorySelectDisabled = filteredSubCategories.length === 0;
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
@@ -137,6 +158,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       }
       router.refresh();
       router.push(`/${params.storeId}/products`);
+      router.refresh();
       toast.success(toastMessage);
     } catch (error: any) {
       toast.error("Algo salió mal. Inténtalo de nuevo.");
@@ -310,7 +332,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 <FormItem>
                   <FormLabel>Subcategoría</FormLabel>
                   <Select
-                    disabled={loading || !selectedCategoryId}
+                    disabled={
+                      loading ||
+                      !selectedCategoryId ||
+                      isSubCategorySelectDisabled
+                    }
                     onValueChange={field.onChange}
                     value={field.value || ""}
                     defaultValue={field.value || ""}
@@ -324,7 +350,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {filteredSubCategories.length > 0 ? (
+                      {filteredSubCategories.length > 0 &&
                         filteredSubCategories.map((subCategory) => (
                           <SelectItem
                             key={subCategory.id}
@@ -332,13 +358,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                           >
                             {subCategory.name}
                           </SelectItem>
-                        ))
-                      ) : (
-                        // No incluir un SelectItem con valor vacío
-                        <div className="text-center p-2 text-gray-500">
-                          No hay subcategorías disponibles
-                        </div>
-                      )}
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

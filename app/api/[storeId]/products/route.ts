@@ -17,37 +17,38 @@ export async function POST(
       subCategoryId,
       name,
       price,
-      stock,
       images,
       isFeatured,
       isArchived,
-      variants,
+      stock,
       brandId,
       providerId,
     } = body;
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 403 });
-    }
-
-    if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
-    }
-
-    if (!images || !images.length) {
-      return new NextResponse("Images are required", { status: 400 });
-    }
-
-    if (!price) {
-      return new NextResponse("Price is required", { status: 400 });
-    }
-
-    if (!categoryId) {
-      return new NextResponse("Category id is required", { status: 400 });
+      return new NextResponse("No autorizado", { status: 403 });
     }
 
     if (!params.storeId) {
-      return new NextResponse("Store id is required", { status: 400 });
+      return new NextResponse("Id de la tienda es requerido", { status: 400 });
+    }
+
+    if (!name) {
+      return new NextResponse("Nombre es requerido", { status: 400 });
+    }
+
+    if (!images || !images.length) {
+      return new NextResponse("Imagenes son requeridas", { status: 400 });
+    }
+
+    if (!price) {
+      return new NextResponse("Precio es requerido", { status: 400 });
+    }
+
+    if (!categoryId) {
+      return new NextResponse("Id de la categoria es requerido", {
+        status: 400,
+      });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -58,7 +59,7 @@ export async function POST(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
+      return new NextResponse("No autorizado", { status: 405 });
     }
 
     const product = await prismadb.product.create({
@@ -68,6 +69,10 @@ export async function POST(
         isFeatured,
         isArchived,
         categoryId,
+        subCategoryId,
+        stock,
+        brandId,
+        providerId,
         storeId: params.storeId,
         images: {
           createMany: {
@@ -91,9 +96,16 @@ export async function GET(
   try {
     const { searchParams } = new URL(req.url);
     const categoryId = searchParams.get("categoryId") || undefined;
-    const colorId = searchParams.get("colorId") || undefined;
-    const sizeId = searchParams.get("sizeId") || undefined;
+    const subCategoryId = searchParams.get("subCategoryId") || undefined;
     const isFeatured = searchParams.get("isFeatured");
+    const brandId = searchParams.get("brandId") || undefined;
+    const providerId = searchParams.get("providerId") || undefined;
+    const minPrice = searchParams.get("minPrice")
+      ? parseFloat(searchParams.get("minPrice")!)
+      : undefined;
+    const maxPrice = searchParams.get("maxPrice")
+      ? parseFloat(searchParams.get("maxPrice")!)
+      : undefined;
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -103,12 +115,23 @@ export async function GET(
       where: {
         storeId: params.storeId,
         categoryId,
+        subCategoryId,
+        brandId,
+        providerId,
         isFeatured: isFeatured ? true : undefined,
         isArchived: false,
+        price: {
+          gte: minPrice,
+          lte: maxPrice,
+        },
       },
       include: {
         images: true,
         category: true,
+        subCategory: true,
+        variants: true,
+        brand: true,
+        provider: true,
       },
       orderBy: {
         createdAt: "desc",
