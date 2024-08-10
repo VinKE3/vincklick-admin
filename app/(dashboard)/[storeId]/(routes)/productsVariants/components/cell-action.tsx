@@ -16,10 +16,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { ProductColumn } from "./columns";
+import { ProductVariantColumn } from "./columns";
 
 interface CellActionProps {
-  data: ProductColumn;
+  data: ProductVariantColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -31,8 +31,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onConfirm = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/products/${data.id}`);
-      toast.success("Producto Eliminado.");
+      await axios.delete(`/api/${params.storeId}/productsVariants/${data.id}`);
+      toast.success("Variación de Producto Eliminado.");
       router.refresh();
     } catch (error) {
       toast.error("Algo salió mal. Inténtalo de nuevo.");
@@ -69,7 +69,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
-              router.push(`/${params.storeId}/products/${data.id}`)
+              router.push(`/${params.storeId}/productsVariants/${data.id}`)
             }
           >
             <Edit className="mr-2 h-4 w-4" /> Editar

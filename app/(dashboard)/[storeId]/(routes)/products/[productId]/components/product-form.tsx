@@ -41,7 +41,7 @@ const formSchema = z.object({
     .array()
     .min(1, { message: "Requerido" }),
   price: z.coerce.number().min(1, { message: "Requerido" }),
-  stock: z.coerce.number().min(1).optional(),
+  stock: z.coerce.string().optional().nullable(),
   categoryId: z.string().min(1, { message: "Requerido" }),
   subCategoryId: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false).optional(),
@@ -111,7 +111,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     ? {
         ...initialData,
         price: parseFloat(String(initialData?.price)),
-        stock: parseFloat(String(initialData?.price)),
+        stock: parseFloat(String(initialData?.stock)).toFixed(0),
         categoryId: initialData.categoryId || "",
         subCategoryId: initialData.subCategoryId || "", // Asegúrate de que subCategoryId esté correctamente inicializado
       }
@@ -119,7 +119,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         name: "",
         images: [],
         price: 0,
-        stock: 1,
+        stock: "sin",
         categoryId: "",
         subCategoryId: "",
         brandId: "",
@@ -281,6 +281,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       disabled={loading}
                       placeholder="1"
                       {...field}
+                      value={field.value ?? ""} // Asegura que el valor nunca sea null
                     />
                   </FormControl>
                   <FormMessage />

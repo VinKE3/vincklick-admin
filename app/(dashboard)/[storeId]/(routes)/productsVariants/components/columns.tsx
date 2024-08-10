@@ -4,17 +4,17 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { CellAction } from "./cell-action";
 
-export type ProductColumn = {
+export type ProductVariantColumn = {
   id: string;
   name: string;
+  sku: string;
+  stock: string;
   price: string;
-  category: string;
-  createdAt: string;
-  isFeatured: boolean;
   isArchived: boolean;
+  createdAt: string;
 };
 
-export const columns: ColumnDef<ProductColumn>[] = [
+export const columns: ColumnDef<ProductVariantColumn>[] = [
   {
     accessorKey: "name",
     header: "Nombre",
@@ -22,18 +22,25 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "isArchived",
     header: "Archivado",
+    cell: ({ row }) => {
+      return row.original.isArchived ? (
+        <div className="text-green-600">Sí</div>
+      ) : (
+        <div className="text-red-600">No</div>
+      );
+    },
   },
   {
-    accessorKey: "isFeatured",
-    header: "Destacado",
+    accessorKey: "sku",
+    header: "SKU",
   },
   {
     accessorKey: "price",
     header: "Precio",
   },
   {
-    accessorKey: "category",
-    header: "Categoría",
+    accessorKey: "stock",
+    header: "Stock",
   },
   {
     accessorKey: "createdAt",
