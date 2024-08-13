@@ -10,6 +10,9 @@ const AttributesPage = async ({ params }: { params: { storeId: string } }) => {
     where: {
       storeId: params.storeId,
     },
+    include: {
+      values: true,
+    },
     orderBy: {
       createdAt: "desc",
     },
@@ -18,7 +21,7 @@ const AttributesPage = async ({ params }: { params: { storeId: string } }) => {
   const formattedAttributes: AttributesColumn[] = attributes.map((item) => ({
     id: item.id,
     name: item.name,
-    values: item.values,
+    values: item.values.map((value) => value.value), // Aquí se retorna el campo 'value' de cada atributo
     createdAt: format(item.createdAt, "dd-MM-yyyy"),
   }));
 

@@ -19,8 +19,10 @@ model Store {
   categories      Category[] @relation("StoreToCategory")
   subCategories   SubCategory[] @relation("StoreToSubCategory")
   attributes      Attribute[] @relation("StoreToAttribute")
+  attributesValues AttributeValue[] @relation("StoreToAttributeValue")
   products        Product[]  @relation("StoreToProduct")
   productsVariant ProductVariant[] @relation("StoreToProductVariant")
+  variantsAttribute VariantAttribute[] @relation("StoreToVariantAttribute")
   colors          Color[]     @relation("StoreToColor")
   orders          Order[]     @relation("StoreToOrder")
   createdAt       DateTime   @default(now())
@@ -170,19 +172,51 @@ model Product {
 }
 
 model Attribute {
-  id        String   @id @default(uuid())
+  id          String   @id @default(uuid())
   storeId     String    // Foreign Key to Store
   store       Store     @relation("StoreToAttribute", fields: [storeId], references: [id])
-  productVariantId String? // Foreign Key to Product Variant
-  productVariant     ProductVariant?  @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
-  name      String   // Ej: "Color", "Tamaño", "Capacidad"
-  values    String[] // Ej: ["Rojo", "Azul"], ["Pequeño", "Mediano"], ["64GB", "128GB"]
+  name        String   // Ej: "Color", "Tamaño", "Capacidad"
+  values      AttributeValue[] @relation("AttributeValueToAttribute")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([storeId])
-  @@index([productVariantId])
 }
+
+model AttributeValue {
+  id          String        @id @default(uuid())
+  storeId     String    // Foreign Key to Store
+  store       Store     @relation("StoreToAttributeValue", fields: [storeId], references: [id])
+  value       String        // Ej: "64GB", "128GB", "4GB"
+  attributeId String        // Foreign Key to Attribute
+  attribute   Attribute     @relation("AttributeValueToAttribute",fields: [attributeId], references: [id])
+  variants    VariantAttribute[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+    @@index([storeId])
+    @@index([attributeId])
+}
+
+model VariantAttribute {
+  id                String            @id @default(uuid())
+  storeId           String            // Foreign Key to Store
+  store             Store             @relation("StoreToVariantAttribute", fields: [storeId], references: [id])
+  productVariantId  String            // Foreign Key to ProductVariant
+  productVariant    ProductVariant    @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+  attributeValueId  String            // Foreign Key to AttributeValue
+  attributeValue    AttributeValue    @relation(fields: [attributeValueId], references: [id], onDelete: Cascade)
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@unique([productVariantId, attributeValueId]) // Para evitar duplicados
+  @@index([storeId])
+  @@index([productVariantId])
+  @@index([attributeValueId])
+}
+
 
 model ProductVariant {
   id          String    @id @default(uuid())
@@ -196,7 +230,7 @@ model ProductVariant {
   stock        String?
   colorId      String?    // Foreign Key to Color
   color        Color?  @relation(fields: [colorId], references: [id])
-  attributes   Attribute[]
+  attributes   VariantAttribute[] // Relación con VariantAttribute
   images       Image[] 
   isArchived  Boolean   @default(false)
 

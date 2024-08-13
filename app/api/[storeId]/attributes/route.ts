@@ -12,7 +12,7 @@ export async function POST(
 
     const body = await req.json();
 
-    const { name, values } = body;
+    const { name } = body;
 
     if (!userId) {
       return new NextResponse("No autorizado", { status: 403 });
@@ -25,13 +25,6 @@ export async function POST(
     if (!name) {
       return new NextResponse("Nombre es requerido", { status: 400 });
     }
-
-    if (!values) {
-      return new NextResponse("Valores son requeridos", {
-        status: 400,
-      });
-    }
-
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -47,7 +40,6 @@ export async function POST(
       data: {
         storeId: params.storeId,
         name,
-        values,
       },
     });
 
@@ -70,6 +62,9 @@ export async function GET(
     const attributes = await prismadb.attribute.findMany({
       where: {
         storeId: params.storeId,
+      },
+      include: {
+        values: true,
       },
     });
 

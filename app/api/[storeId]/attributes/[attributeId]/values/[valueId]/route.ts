@@ -5,31 +5,31 @@ import prismadb from "@/lib/prismadb";
 
 export async function GET(
   req: Request,
-  { params }: { params: { subCategoryId: string } }
+  { params }: { params: { valueId: string } }
 ) {
   try {
-    if (!params.subCategoryId) {
-      return new NextResponse("Id de la Subcategoría es requerido", {
+    if (!params.valueId) {
+      return new NextResponse("Id deL valor es requerido", {
         status: 400,
       });
     }
 
-    const subCategory = await prismadb.subCategory.findUnique({
+    const attributeValue = await prismadb.attributeValue.findUnique({
       where: {
-        id: params.subCategoryId,
+        id: params.valueId,
       },
     });
 
-    return NextResponse.json(subCategory);
+    return NextResponse.json(attributeValue);
   } catch (error) {
-    console.log("[SUBCATEGORY_GET]", error);
+    console.log("[ATTRIBUTEVALUE_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { subCategoryId: string; storeId: string } }
+  { params }: { params: { valueId: string; storeId: string } }
 ) {
   try {
     const { userId } = auth();
@@ -38,8 +38,8 @@ export async function DELETE(
       return new NextResponse("No identificado", { status: 403 });
     }
 
-    if (!params.subCategoryId) {
-      return new NextResponse("Id de la subcategoría es requerido", {
+    if (!params.valueId) {
+      return new NextResponse("Id deL valor es requerido", {
         status: 400,
       });
     }
@@ -55,46 +55,46 @@ export async function DELETE(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
-    const subCategory = await prismadb.subCategory.delete({
+    const attributeValue = await prismadb.attributeValue.delete({
       where: {
-        id: params.subCategoryId,
+        id: params.valueId,
       },
     });
 
-    return NextResponse.json(subCategory);
+    return NextResponse.json(attributeValue);
   } catch (error) {
-    console.log("[SUBCATEGORY_DELETE]", error);
+    console.log("[ATTRIBUTEVALUE_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { subCategoryId: string; storeId: string } }
+  { params }: { params: { valueId: string; storeId: string } }
 ) {
   try {
     const { userId } = auth();
 
     const body = await req.json();
 
-    const { name, categoryId } = body;
+    const { value, attributeId } = body;
 
     if (!userId) {
       return new NextResponse("No identificado", { status: 403 });
     }
 
-    if (!categoryId) {
-      return new NextResponse("Id de la categoría es requerido", {
+    if (!attributeId) {
+      return new NextResponse("Id del atributo es requerido", {
         status: 400,
       });
     }
 
-    if (!name) {
-      return new NextResponse("Nombre es requerido", { status: 400 });
+    if (!value) {
+      return new NextResponse("Valor es requerido", { status: 400 });
     }
 
-    if (!params.subCategoryId) {
-      return new NextResponse("Id de la Subcategoría es requerido", {
+    if (!params.valueId) {
+      return new NextResponse("Id del valor es requerido", {
         status: 400,
       });
     }
@@ -110,19 +110,19 @@ export async function PATCH(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
-    const subCategory = await prismadb.subCategory.update({
+    const attributeValue = await prismadb.attributeValue.update({
       where: {
-        id: params.subCategoryId,
+        id: params.valueId,
       },
       data: {
-        name,
-        categoryId,
+        value,
+        attributeId,
       },
     });
 
-    return NextResponse.json(subCategory);
+    return NextResponse.json(attributeValue);
   } catch (error) {
-    console.log("[SUBCATEGORY_PATCH]", error);
+    console.log("[ATTRIBUTEVALUE_PATCH]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

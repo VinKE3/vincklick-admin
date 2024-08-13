@@ -26,14 +26,6 @@ import { AlertModal } from "@/components/modals/alert-modal";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Requerido" }),
-  values: z
-    .object({
-      valueAttribute: z.string(),
-    })
-    .array()
-    .min(1, {
-      message: "Requerido",
-    }),
 });
 
 type AttributeFormValues = z.infer<typeof formSchema>;
@@ -65,33 +57,29 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
     defaultValues: initialData
       ? {
           name: initialData.name,
-          values: initialData.values.map((value) => ({
-            valueAttribute: value,
-          })),
         }
       : {
           name: "",
-          values: [],
         },
   });
-
+  const [attributeId, setAttributeId] = useState(initialData?.id || "");
   const onSubmit = async (data: AttributeFormValues) => {
     try {
       setLoading(true);
-      const transformedData = {
-        ...data,
-        values: data.values.map((value) => value.valueAttribute), // Extraer solo el valor de cada objeto
-      };
+      let response;
       if (initialData) {
-        await axios.patch(
+        response = await axios.patch(
           `/api/${params.storeId}/attributes/${params.attributeId}`,
-          transformedData
+          data
         );
       } else {
-        await axios.post(`/api/${params.storeId}/attributes`, transformedData);
+        response = await axios.post(`/api/${params.storeId}/attributes`, data);
       }
-      router.refresh();
-      router.push(`/${params.storeId}/attributes`);
+
+      // Store the attribute ID after creation
+      const id = response.data.id;
+      setAttributeId(id);
+
       router.refresh();
       toast.success(toastMessage);
     } catch (error: any) {
@@ -118,6 +106,10 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
       setLoading(false);
       setOpen(false);
     }
+  };
+
+  const handleCreateValues = () => {
+    router.push(`/${params.storeId}/attributes/${attributeId}/values`);
   };
 
   return (
@@ -165,35 +157,15 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="values"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Valores</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Nombre del Atributo"
-                      value={field.value
-                        .map((value) => value.valueAttribute)
-                        .join(", ")} // Unir los valores en una cadena separada por comas para mostrar
-                      onChange={(e) => {
-                        const values = e.target.value
-                          .split(",")
-                          .map((value) => ({ valueAttribute: value.trim() }));
-                        field.onChange(values);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}
           </Button>
+          {attributeId && (
+            <div className="mt-4">
+              <Button onClick={handleCreateValues}>Crear Valores</Button>
+            </div>
+          )}
         </form>
       </Form>
     </>
