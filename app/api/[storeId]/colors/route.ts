@@ -46,6 +46,20 @@ export async function POST(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
+    const existingColor = await prismadb.color.findFirst({
+      where: {
+        OR: [{ name }, { value }],
+      },
+    });
+
+    if (existingColor) {
+      return new NextResponse("El color o el valor ya existen", {
+        status: 409,
+      });
+    }
+
+    //*Crear el nuevo color
+
     const color = await prismadb.color.create({
       data: {
         name,

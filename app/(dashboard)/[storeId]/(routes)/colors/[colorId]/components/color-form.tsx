@@ -91,7 +91,10 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
       router.refresh();
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error("Algo Salío mal.");
+      const errorMessage =
+        error.response?.data || "Algo salió mal. Inténtalo de nuevo.";
+      toast.error(errorMessage);
+      console.log(error);
     } finally {
       setLoading(false);
     }

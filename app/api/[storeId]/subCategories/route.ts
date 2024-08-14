@@ -41,6 +41,17 @@ export async function POST(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
+    const existingSubcategory = await prismadb.subCategory.findFirst({
+      where: {
+        name: name,
+      },
+    });
+
+    if (existingSubcategory) {
+      return new NextResponse("La subcategoría ya existe", { status: 409 });
+    }
+
+    //*Crear la nueva subcategoría
     const subCategory = await prismadb.subCategory.create({
       data: {
         name,

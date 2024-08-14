@@ -47,6 +47,18 @@ export async function POST(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
+    const existingCategory = await prismadb.category.findFirst({
+      where: {
+        name: name,
+      },
+    });
+
+    if (existingCategory) {
+      return new NextResponse("La categoría ya existe", { status: 409 });
+    }
+
+    //*Crear la nueva categoría
+
     const category = await prismadb.category.create({
       data: {
         name,

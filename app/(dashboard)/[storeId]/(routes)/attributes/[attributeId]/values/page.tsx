@@ -6,11 +6,12 @@ import { AttibutesValuesClient } from "./components/client";
 const AttributesValuesPage = async ({
   params,
 }: {
-  params: { storeId: string };
+  params: { storeId: string; attributeId: string };
 }) => {
   const valuesAttributes = await prismadb.attributeValue.findMany({
     where: {
       storeId: params.storeId,
+      attributeId: params.attributeId,
     },
     include: {
       attribute: true,

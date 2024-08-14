@@ -72,7 +72,8 @@ export const AttributeValueForm: React.FC<AttributeValueFormProps> = ({
           attributeId: params.attributeId as string,
         },
   });
-
+  // Destructure the reset function
+  const { reset } = form;
   const onSubmit = async (data: AttributeValueFormValues) => {
     try {
       setLoading(true);
@@ -92,6 +93,7 @@ export const AttributeValueForm: React.FC<AttributeValueFormProps> = ({
 
       toast.success(toastMessage);
       router.refresh();
+      reset();
     } catch (error: any) {
       const errorMessage =
         error.response?.data || "Algo salió mal. Inténtalo de nuevo.";

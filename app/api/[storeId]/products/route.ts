@@ -62,6 +62,18 @@ export async function POST(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
+    const existingProduct = await prismadb.product.findFirst({
+      where: {
+        name: name,
+      },
+    });
+
+    if (existingProduct) {
+      return new NextResponse("El producto ya existe", { status: 409 });
+    }
+
+    //*Crear el nuevo producto
+
     const product = await prismadb.product.create({
       data: {
         name,

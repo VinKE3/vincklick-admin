@@ -36,6 +36,17 @@ export async function POST(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
+    const existingAttribute = await prismadb.attribute.findFirst({
+      where: {
+        name: name,
+      },
+    });
+
+    if (existingAttribute) {
+      return new NextResponse("El atributo ya existe", { status: 409 });
+    }
+
+    //*Crear el nuevo atributo
     const attribute = await prismadb.attribute.create({
       data: {
         storeId: params.storeId,

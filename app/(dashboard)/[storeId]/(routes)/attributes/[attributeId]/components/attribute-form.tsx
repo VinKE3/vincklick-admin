@@ -63,6 +63,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
         },
   });
   const [attributeId, setAttributeId] = useState(initialData?.id || "");
+  const [isAttributeId, setIsAttributeId] = useState(false);
   const onSubmit = async (data: AttributeFormValues) => {
     try {
       setLoading(true);
@@ -76,14 +77,16 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
         response = await axios.post(`/api/${params.storeId}/attributes`, data);
       }
 
-      // Store the attribute ID after creation
+      //?Almacenar el ID del atributo después de la creación
       const id = response.data.id;
       setAttributeId(id);
-
-      router.refresh();
+      setIsAttributeId(true);
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error("Algo Salío mal.");
+      const errorMessage =
+        error.response?.data || "Algo salió mal. Inténtalo de nuevo.";
+      toast.error(errorMessage);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -158,12 +161,18 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
               )}
             />
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
+          <Button
+            disabled={loading || isAttributeId}
+            className="ml-auto"
+            type="submit"
+          >
             {action}
           </Button>
           {attributeId && (
             <div className="mt-4">
-              <Button onClick={handleCreateValues}>Crear Valores</Button>
+              <Button type="button" onClick={handleCreateValues}>
+                Crear Valores
+              </Button>
             </div>
           )}
         </form>

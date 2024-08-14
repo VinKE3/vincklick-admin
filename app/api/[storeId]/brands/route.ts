@@ -37,6 +37,18 @@ export async function POST(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
+    const existingBrand = await prismadb.brand.findFirst({
+      where: {
+        name: name,
+      },
+    });
+
+    if (existingBrand) {
+      return new NextResponse("La marca ya existe", { status: 409 });
+    }
+
+    //*Crear la nueva marca
+
     const brand = await prismadb.brand.create({
       data: {
         name,

@@ -90,7 +90,10 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({ initialData }) => {
       router.refresh();
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error("Algo salió mal. Inténtalo de nuevo");
+      const errorMessage =
+        error.response?.data || "Algo salió mal. Inténtalo de nuevo.";
+      toast.error(errorMessage);
+      console.log(error);
     } finally {
       setLoading(false);
     }

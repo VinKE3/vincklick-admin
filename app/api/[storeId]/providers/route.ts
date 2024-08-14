@@ -37,6 +37,18 @@ export async function POST(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
+    const existingProvider = await prismadb.provider.findFirst({
+      where: {
+        name: name,
+      },
+    });
+
+    if (existingProvider) {
+      return new NextResponse("El proveedor ya existe", { status: 409 });
+    }
+
+    //*Crear el nuevo proveedor
+
     const provider = await prismadb.provider.create({
       data: {
         name,

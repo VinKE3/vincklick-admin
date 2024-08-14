@@ -35,7 +35,7 @@ export const AttibutesValuesClient: React.FC<SubCategoriesClientProps> = ({
             )
           }
         >
-          <Plus className="mr-2 h-4 w-4" /> Nueva
+          <Plus className="mr-2 h-4 w-4" /> Nuevo
         </Button>
       </div>
       <Separator />

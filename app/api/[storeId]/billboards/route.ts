@@ -40,7 +40,16 @@ export async function POST(
     if (!storeByUserId) {
       return new NextResponse("No autorizado", { status: 405 });
     }
+    const existingBillboard = await prismadb.billboard.findFirst({
+      where: {
+        label: label,
+      },
+    });
 
+    if (existingBillboard) {
+      return new NextResponse("El Banner ya existe", { status: 409 });
+    }
+    //*Crear el nuevo Billboard
     const billboard = await prismadb.billboard.create({
       data: {
         label,
