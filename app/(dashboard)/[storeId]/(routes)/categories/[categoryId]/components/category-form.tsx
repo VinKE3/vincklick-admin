@@ -50,11 +50,13 @@ type CategoryFormValues = z.infer<typeof formSchema>;
 interface CategoryFormProps {
   initialData: Category | null;
   billboards: Billboard[];
+  colors: Color[];
 }
 
 export const CategoryForm: React.FC<CategoryFormProps> = ({
   initialData,
   billboards,
+  colors,
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -210,6 +212,38 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                       {billboards.map((billboard) => (
                         <SelectItem key={billboard.id} value={billboard.id}>
                           {billboard.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="colorId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Color</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value || ""}
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value || ""}
+                          placeholder="Seleccionar Color"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {colors?.map((color) => (
+                        <SelectItem key={color.id} value={color.id}>
+                          {color.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

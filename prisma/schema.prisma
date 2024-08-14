@@ -150,8 +150,11 @@ model Product {
   subCategoryId String?
   subCategory SubCategory? @relation("SubCategoryToProduct", fields: [subCategoryId], references: [id]) 
   name        String
-  price       Decimal   
-  stock       String?
+  price       Decimal  
+  isPriceOffer Boolean @default(false)
+  priceOffer  Decimal? 
+  isStock     Boolean @default(false)
+  stock       Int?
   images      Image[]   // Relation to Image model
   isFeatured  Boolean   @default(false)
   isArchived  Boolean   @default(false)

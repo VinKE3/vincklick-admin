@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import ImageUpload from "@/components/ui/image-upload";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Value } from "@radix-ui/react-select";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Requerido" }),
@@ -41,7 +42,12 @@ const formSchema = z.object({
     .array()
     .min(1, { message: "Requerido" }),
   price: z.coerce.number().min(1, { message: "Requerido" }),
-  stock: z.coerce.string().optional().nullable(),
+  stock: z.coerce
+    .number()
+    .min(1, { message: "Minimo 1" })
+    .optional()
+    .nullable(),
+  isStock: z.boolean().default(false).optional(),
   categoryId: z.string().min(1, { message: "Requerido" }),
   subCategoryId: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false).optional(),
@@ -111,15 +117,19 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     ? {
         ...initialData,
         price: parseFloat(String(initialData?.price)),
-        stock: parseFloat(String(initialData?.stock)).toFixed(0),
+        stock: initialData.isStock
+          ? parseFloat(String(initialData.stock)) // Ensure it's a number
+          : null, // Set to null if not enabled
         categoryId: initialData.categoryId || "",
-        subCategoryId: initialData.subCategoryId || "", // Asegúrate de que subCategoryId esté correctamente inicializado
+        subCategoryId: initialData.subCategoryId || "",
+        isStock: initialData.isStock || false,
       }
     : {
         name: "",
         images: [],
         price: 0,
-        stock: "sin",
+        stock: null,
+        isStock: false,
         categoryId: "",
         subCategoryId: "",
         brandId: "",
@@ -144,6 +154,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       ?.subcategories || [];
 
   const isSubCategorySelectDisabled = filteredSubCategories.length === 0;
+  const isStock = form.watch("isStock");
+
+  useEffect(() => {
+    if (!form.watch("isStock")) {
+      form.setValue("stock", null); // Ajustar stock a null si isStock es false
+    } else {
+      form.setValue("stock", 1);
+    }
+  }, [form.watch("isStock")]);
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
@@ -184,7 +203,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       setOpen(false);
     }
   };
-
+  console.log("Current form values:", form.getValues());
   return (
     <>
       <AlertModal
@@ -274,26 +293,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
-              name="stock"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Stock</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      disabled={loading}
-                      placeholder="1"
-                      {...field}
-                      value={field.value ?? ""} // Asegura que el valor nunca sea null
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="categoryId"
               render={({ field }) => (
                 <FormItem>
@@ -327,8 +326,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
-
-            {/* Select para Subcategoría */}
             <FormField
               control={form.control}
               name="subCategoryId"
@@ -435,6 +432,49 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
+              name="isStock"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked)}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Activar Stock</FormLabel>
+                    <FormDescription>
+                      Agrega el stock del producto
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {isStock && (
+              <FormField
+                control={form.control}
+                name="stock"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Stock</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        disabled={loading}
+                        placeholder="Stock"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <FormField
+              control={form.control}
               name="isFeatured"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
@@ -454,6 +494,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="isArchived"
