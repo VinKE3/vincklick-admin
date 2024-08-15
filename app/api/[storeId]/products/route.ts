@@ -18,6 +18,7 @@ export async function POST(
       name,
       price,
       priceOffer,
+      isPriceOffer,
       images,
       isFeatured,
       isArchived,
@@ -80,6 +81,7 @@ export async function POST(
       data: {
         name,
         price,
+        isPriceOffer,
         priceOffer,
         isFeatured,
         isArchived,
@@ -114,6 +116,8 @@ export async function GET(
     const categoryId = searchParams.get("categoryId") || undefined;
     const subCategoryId = searchParams.get("subCategoryId") || undefined;
     const isFeatured = searchParams.get("isFeatured");
+    const isStock = searchParams.get("isStock") || undefined;
+    const isPriceOffer = searchParams.get("isPriceOffer") || undefined;
     const brandId = searchParams.get("brandId") || undefined;
     const providerId = searchParams.get("providerId") || undefined;
     const minPrice = searchParams.get("minPrice")
@@ -122,7 +126,18 @@ export async function GET(
     const maxPrice = searchParams.get("maxPrice")
       ? parseFloat(searchParams.get("maxPrice")!)
       : undefined;
-
+    const minPriceOffer = searchParams.get("minPriceOffer")
+      ? parseFloat(searchParams.get("minPriceOffer")!)
+      : undefined;
+    const maxPriceOffer = searchParams.get("maxPriceOffer")
+      ? parseFloat(searchParams.get("maxPriceOffer")!)
+      : undefined;
+    const minStock = searchParams.get("minStock")
+      ? parseFloat(searchParams.get("minStock")!)
+      : undefined;
+    const maxStock = searchParams.get("maxStock")
+      ? parseFloat(searchParams.get("maxStock")!)
+      : undefined;
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
@@ -134,11 +149,21 @@ export async function GET(
         subCategoryId,
         brandId,
         providerId,
+        isPriceOffer: isPriceOffer ? true : undefined,
+        isStock: isStock ? true : undefined,
         isFeatured: isFeatured ? true : undefined,
         isArchived: false,
         price: {
           gte: minPrice,
           lte: maxPrice,
+        },
+        priceOffer: {
+          gte: minPriceOffer,
+          lte: maxPriceOffer,
+        },
+        stock: {
+          gte: minStock,
+          lte: maxStock,
         },
       },
       include: {

@@ -228,12 +228,12 @@ model ProductVariant {
   productId    String    // Foreign key to Product
   product      Product   @relation(fields: [productId], references: [id])
   name         String
-  sku          String    // Código único de la variante (opcional)
+  sku          String    
   price        Decimal?
   stock        String?
-  colorId      String?    // Foreign Key to Color
+  colorId      String?   
   color        Color?  @relation(fields: [colorId], references: [id])
-  attributes   VariantAttribute[] // Relación con VariantAttribute
+  attributes   VariantAttribute[] 
   images       Image[] 
   isArchived  Boolean   @default(false)
 

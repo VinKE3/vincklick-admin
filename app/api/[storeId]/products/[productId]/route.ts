@@ -87,6 +87,7 @@ export async function PATCH(
       name,
       price,
       priceOffer,
+      isPriceOffer,
       images,
       isFeatured,
       isArchived,
@@ -140,6 +141,7 @@ export async function PATCH(
       data: {
         name,
         price,
+        isPriceOffer,
         priceOffer,
         isFeatured,
         isArchived,

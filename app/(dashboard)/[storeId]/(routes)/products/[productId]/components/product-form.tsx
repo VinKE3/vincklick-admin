@@ -47,6 +47,12 @@ const formSchema = z.object({
     .optional()
     .nullable(),
   isStock: z.boolean().default(false).optional(),
+  priceOffer: z.coerce
+    .number()
+    .min(1, { message: "Minimo 1" })
+    .optional()
+    .nullable(),
+  isPriceOffer: z.boolean().default(false).optional(),
   categoryId: z.string().min(1, { message: "Requerido" }),
   subCategoryId: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false).optional(),
@@ -116,6 +122,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     ? {
         ...initialData,
         price: parseFloat(String(initialData?.price)),
+        priceOffer: initialData.isPriceOffer
+          ? parseFloat(String(initialData?.priceOffer))
+          : null,
         stock: initialData.isStock
           ? parseFloat(String(initialData.stock))
           : null,
@@ -127,6 +136,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         name: "",
         images: [],
         price: 0,
+        priceOffer: null,
         stock: null,
         isStock: false,
         categoryId: "",
@@ -147,21 +157,27 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     initialData?.categoryId || ""
   );
 
-  // Filtrar subcategorías según la categoría seleccionada
   const filteredSubCategories =
     categories.find((category) => category.id === selectedCategoryId)
       ?.subcategories || [];
 
   const isSubCategorySelectDisabled = filteredSubCategories.length === 0;
   const isStock = form.watch("isStock");
+  const isPriceOffer = form.watch("isPriceOffer");
+  const isFeatured = form.watch("isFeatured");
+  const isArchived = form.watch("isArchived");
 
   useEffect(() => {
     if (!form.watch("isStock")) {
-      form.setValue("stock", null); // Ajustar stock a null si isStock es false
-    } else {
-      form.setValue("stock", 1);
+      form.setValue("stock", null);
     }
   }, [form.watch("isStock")]);
+
+  useEffect(() => {
+    if (!form.watch("isPriceOffer")) {
+      form.setValue("priceOffer", null);
+    }
+  }, [form.watch("isPriceOffer")]);
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
@@ -202,7 +218,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       setOpen(false);
     }
   };
-  console.log("Current form values:", form.getValues());
+
   return (
     <>
       <AlertModal
@@ -254,7 +270,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </FormItem>
             )}
           />
-          <div className="md:grid md:grid-cols-3 gap-8">
+
+          <div className="md:grid md:grid-cols-2 gap-8">
             <FormField
               control={form.control}
               name="name"
@@ -429,6 +446,52 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+          </div>
+
+          <div className="md:grid md:grid-cols-4 gap-8">
+            <FormField
+              control={form.control}
+              name="isPriceOffer"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked)}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Activar Precio Oferta</FormLabel>
+                    <FormDescription>
+                      Agrega un precio promocional
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+            {isPriceOffer && (
+              <FormField
+                control={form.control}
+                name="priceOffer"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Precio Oferta</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        disabled={loading}
+                        placeholder="Precio Oferta"
+                        {...field}
+                        value={field.value ?? 1}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="isStock"
@@ -449,7 +512,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
-
             {isStock && (
               <FormField
                 control={form.control}
@@ -472,6 +534,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 )}
               />
             )}
+          </div>
+          <div className="md:grid md:grid-cols-2 gap-8">
             <FormField
               control={form.control}
               name="isFeatured"
@@ -482,6 +546,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       checked={field.value}
                       // @ts-ignore
                       onCheckedChange={field.onChange}
+                      disabled={isArchived}
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
@@ -493,7 +558,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="isArchived"
@@ -504,6 +568,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       checked={field.value}
                       // @ts-ignore
                       onCheckedChange={field.onChange}
+                      disabled={isFeatured}
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
