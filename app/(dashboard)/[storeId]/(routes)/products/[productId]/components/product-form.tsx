@@ -33,7 +33,6 @@ import {
 } from "@/components/ui/select";
 import ImageUpload from "@/components/ui/image-upload";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Value } from "@radix-ui/react-select";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Requerido" }),
@@ -118,8 +117,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         ...initialData,
         price: parseFloat(String(initialData?.price)),
         stock: initialData.isStock
-          ? parseFloat(String(initialData.stock)) // Ensure it's a number
-          : null, // Set to null if not enabled
+          ? parseFloat(String(initialData.stock))
+          : null,
         categoryId: initialData.categoryId || "",
         subCategoryId: initialData.subCategoryId || "",
         isStock: initialData.isStock || false,
@@ -465,7 +464,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                         disabled={loading}
                         placeholder="Stock"
                         {...field}
-                        value={field.value ?? ""}
+                        value={field.value ?? 1}
                       />
                     </FormControl>
                     <FormMessage />
