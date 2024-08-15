@@ -167,6 +167,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const isFeatured = form.watch("isFeatured");
   const isArchived = form.watch("isArchived");
 
+  const [productId, setProductId] = useState(initialData?.id || "");
+  const [isProductId, setIsProductId] = useState(false);
+
   useEffect(() => {
     if (!form.watch("isStock")) {
       form.setValue("stock", null);
@@ -182,17 +185,19 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
+      let response;
       if (initialData) {
-        await axios.patch(
+        response = await axios.patch(
           `/api/${params.storeId}/products/${params.productId}`,
           data
         );
       } else {
-        await axios.post(`/api/${params.storeId}/products`, data);
+        response = await axios.post(`/api/${params.storeId}/products`, data);
       }
-      router.refresh();
-      router.push(`/${params.storeId}/products`);
-      router.refresh();
+      //?Almacenar el ID del atributo después de la creación
+      const id = response.data.id;
+      setProductId(id);
+      setIsProductId(true);
       toast.success(toastMessage);
     } catch (error: any) {
       const errorMessage =
@@ -217,6 +222,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       setLoading(false);
       setOpen(false);
     }
+  };
+
+  const handleCreateVariants = () => {
+    router.push(`/${params.storeId}/products/${productId}/variants`);
   };
 
   return (
@@ -581,9 +590,20 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               )}
             />
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
+          <div className="flex space-x-4">
+            <Button disabled={loading || isProductId} type="submit">
+              {action}
+            </Button>
+            {productId && (
+              <Button
+                type="button"
+                className="bg-green-600 hover:bg-green-800"
+                onClick={handleCreateVariants}
+              >
+                Crear Variaciones
+              </Button>
+            )}
+          </div>
         </form>
       </Form>
     </>

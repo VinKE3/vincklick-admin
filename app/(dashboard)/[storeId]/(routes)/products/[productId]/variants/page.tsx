@@ -25,10 +25,10 @@ const ProductsVariantsPage = async ({
       id: item.id,
       name: item.name,
       sku: item.sku,
-      stock: item.stock ? item.stock.toString() : "No definido", // Convert stock to string
+      stock: item.stock ? item.stock.toString() : "No definido",
       price: item.price
         ? formatter.format(item.price.toNumber())
-        : "Sin precio", // Maneja el caso donde price es null
+        : "Sin precio",
       isArchived: item.isArchived,
       createdAt: format(item.createdAt, "MMMM do, yyyy"),
     }));

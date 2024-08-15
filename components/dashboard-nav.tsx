@@ -99,13 +99,6 @@ export function DashboardNav({
       active: pathname === `/${params.storeId}/products`,
     },
     {
-      href: `/${params.storeId}/productsVariants`,
-      title: "Variaciones de Productos",
-      label: "Variaciones de Productos",
-      icon: "monitor",
-      active: pathname === `/${params.storeId}/productsVariants`,
-    },
-    {
       href: `/${params.storeId}/orders`,
       title: "Ordenes",
       label: "Ordenes",

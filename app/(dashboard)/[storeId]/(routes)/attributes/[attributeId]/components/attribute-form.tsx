@@ -161,20 +161,20 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
               )}
             />
           </div>
-          <Button
-            disabled={loading || isAttributeId}
-            className="ml-auto"
-            type="submit"
-          >
-            {action}
-          </Button>
-          {attributeId && (
-            <div className="mt-4">
-              <Button type="button" onClick={handleCreateValues}>
+          <div className="flex space-x-4">
+            <Button disabled={loading || isAttributeId} type="submit">
+              {action}
+            </Button>
+            {attributeId && (
+              <Button
+                type="button"
+                className="bg-green-600 hover:bg-green-800"
+                onClick={handleCreateValues}
+              >
                 Crear Valores
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </form>
       </Form>
     </>
