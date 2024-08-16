@@ -36,7 +36,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       router.refresh();
     } catch (error) {
       toast.error(
-        "Asegúrese de eliminar todos los productos que utilizan este Atributo."
+        "Asegúrese de eliminar todos los valores que utilizan este Atributo."
       );
     } finally {
       setOpen(false);

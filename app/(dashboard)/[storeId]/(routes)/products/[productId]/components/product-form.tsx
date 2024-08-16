@@ -198,7 +198,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       const id = response.data.id;
       setProductId(id);
       setIsProductId(true);
+      router.refresh();
       toast.success(toastMessage);
+      router.refresh();
     } catch (error: any) {
       const errorMessage =
         error.response?.data || "Algo salió mal. Inténtalo de nuevo.";
@@ -279,8 +281,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </FormItem>
             )}
           />
-
-          <div className="md:grid md:grid-cols-2 gap-8">
+          <div className="md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}
               name="name"
@@ -456,8 +457,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               )}
             />
           </div>
-
-          <div className="md:grid md:grid-cols-4 gap-8">
+          <div className="md:grid md:grid-cols-4 gap-8 space-y-2">
             <FormField
               control={form.control}
               name="isPriceOffer"
@@ -475,32 +475,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       Agrega un precio promocional
                     </FormDescription>
                   </div>
+                  {isPriceOffer && (
+                    <FormField
+                      control={form.control}
+                      name="priceOffer"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              disabled={loading}
+                              placeholder="Precio Oferta"
+                              {...field}
+                              value={field.value ?? 1}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </FormItem>
               )}
             />
-            {isPriceOffer && (
-              <FormField
-                control={form.control}
-                name="priceOffer"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Precio Oferta</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        disabled={loading}
-                        placeholder="Precio Oferta"
-                        {...field}
-                        value={field.value ?? 1}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
             <FormField
               control={form.control}
               name="isStock"
@@ -518,33 +516,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       Agrega el stock del producto
                     </FormDescription>
                   </div>
+                  {isStock && (
+                    <FormField
+                      control={form.control}
+                      name="stock"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              disabled={loading}
+                              placeholder="Stock"
+                              {...field}
+                              value={field.value ?? 1}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </FormItem>
               )}
             />
-            {isStock && (
-              <FormField
-                control={form.control}
-                name="stock"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stock</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        disabled={loading}
-                        placeholder="Stock"
-                        {...field}
-                        value={field.value ?? 1}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </div>
-          <div className="md:grid md:grid-cols-2 gap-8">
             <FormField
               control={form.control}
               name="isFeatured"
@@ -590,6 +585,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               )}
             />
           </div>
+          <div className="md:grid md:grid-cols-2 gap-8"></div>
           <div className="flex space-x-4">
             <Button disabled={loading || isProductId} type="submit">
               {action}

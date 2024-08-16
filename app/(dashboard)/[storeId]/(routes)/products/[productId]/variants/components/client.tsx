@@ -1,16 +1,16 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { ApiList } from "@/components/ui/api-list";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { ProductVariantColumn, columns } from "./columns";
+import { ApiListVariantsProducts } from "@/components/ui/api-list-variantsProducts";
 
 interface ProductsVariantsClientProps {
   data: ProductVariantColumn[];
@@ -29,11 +29,24 @@ export const ProductsVariantsClient: React.FC<ProductsVariantsClientProps> = ({
           title={`Varaciones de Productos`}
           description="Gestione las variaciones de productos de la tienda"
         />
-        <Button
-          onClick={() => router.push(`/${params.storeId}/productsVariants/new`)}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Nuevo
-        </Button>
+        <div className="space-y-2 space-x-0 sm:space-x-4">
+          <Button
+            onClick={() =>
+              router.push(`/${params.storeId}/products/${params.productId}`)
+            }
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" /> Ver Producto
+          </Button>
+          <Button
+            onClick={() =>
+              router.push(
+                `/${params.storeId}/products/${params.productId}/variants/new`
+              )
+            }
+          >
+            <Plus className="mr-2 h-4 w-4" /> Nueva
+          </Button>
+        </div>
       </div>
       <Separator />
       <DataTable searchKey="name" columns={columns} data={data} />
@@ -60,9 +73,9 @@ export const ProductsVariantsClient: React.FC<ProductsVariantsClientProps> = ({
         <>
           <Heading title="API" description="API Calls for Products Variants" />
           <Separator />
-          <ApiList
-            entityName="productsVariants"
-            entityIdName="productVariantId"
+          <ApiListVariantsProducts
+            entityName="variants"
+            entityIdName="variantId"
           />
         </>
       )}

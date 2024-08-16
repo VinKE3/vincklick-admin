@@ -219,7 +219,9 @@ export const AttributeValueForm: React.FC<AttributeValueFormProps> = ({
             <Button disabled={loading} type="submit">
               {action}
             </Button>
-            <Button onClick={handleBackValues}>Tabla de valores</Button>
+            <Button type="button" onClick={handleBackValues}>
+              Tabla de valores
+            </Button>
           </div>
         </form>
       </Form>

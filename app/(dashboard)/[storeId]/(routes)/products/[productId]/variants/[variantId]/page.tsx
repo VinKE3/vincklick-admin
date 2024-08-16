@@ -5,11 +5,11 @@ import { ProductVariantForm } from "./components/product-variant-form";
 const ProductVariantPage = async ({
   params,
 }: {
-  params: { productVariantId: string; storeId: string };
+  params: { variantId: string; storeId: string };
 }) => {
   const productVariant = await prismadb.productVariant.findUnique({
     where: {
-      id: params.productVariantId,
+      id: params.variantId,
     },
   });
   const products = await prismadb.product.findMany({
