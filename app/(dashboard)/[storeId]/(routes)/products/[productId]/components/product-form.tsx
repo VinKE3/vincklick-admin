@@ -36,11 +36,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Requerido" }),
+  sku: z.string().min(1, { message: "Requerido" }),
   images: z
     .object({ url: z.string() }, { message: "Requerido" })
     .array()
     .min(1, { message: "Requerido" }),
-  price: z.coerce.number().min(1, { message: "Requerido" }),
+  price: z.coerce.number().min(1, { message: "Mínimo 1" }),
   stock: z.coerce
     .number()
     .min(1, { message: "Minimo 1" })
@@ -73,7 +74,7 @@ interface SubCategory {
   updatedAt: Date;
 }
 
-interface CategoriaTest {
+interface Category {
   id: string;
   storeId: string;
   billboardId: string;
@@ -91,7 +92,7 @@ interface ProductFormProps {
         images: Image[];
       })
     | null;
-  categories: CategoriaTest[];
+  categories: Category[];
   subCategories: SubCategory[];
   brands: Brand[];
   providers: Provider[];
@@ -134,6 +135,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       }
     : {
         name: "",
+        sku: "",
         images: [],
         price: 0,
         priceOffer: null,
@@ -143,8 +145,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         subCategoryId: "",
         brandId: "",
         providerId: "",
-        colorId: "",
-        sizeId: "",
         isFeatured: false,
         isArchived: false,
       };
@@ -230,6 +230,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     router.push(`/${params.storeId}/products/${productId}/variants`);
   };
 
+  const automaticSku = ({ nameProduct }: { nameProduct: string }) => {
+    const skuName = nameProduct
+      .split(" ")
+      .map((word) => word.substring(0, 3).toUpperCase())
+      .join("");
+
+    return `${skuName}`;
+  };
+
   return (
     <>
       <AlertModal
@@ -281,7 +290,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </FormItem>
             )}
           />
-          <div className="md:grid md:grid-cols-3 gap-8">
+          <div className="md:grid md:grid-cols-3 lg:grid-cols-4 gap-8">
             <FormField
               control={form.control}
               name="name"
@@ -292,6 +301,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     <Input
                       disabled={loading}
                       placeholder="Nombre del producto"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e); // Actualizar el valor del campo 'name'
+                        const generatedSku = automaticSku({
+                          nameProduct: e.target.value,
+                        });
+                        form.setValue("sku", generatedSku); // Generar y establecer el SKU
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="sku"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>SKU</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={true}
+                      placeholder="SKU del producto"
                       {...field}
                     />
                   </FormControl>
@@ -457,12 +490,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               )}
             />
           </div>
-          <div className="md:grid md:grid-cols-4 gap-8 space-y-2">
+          <div className="md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <FormField
               control={form.control}
               name="isPriceOffer"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="flex flex-row items-start space-x-3 pb-2 space-y-0 rounded-md border p-4">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -503,7 +536,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               control={form.control}
               name="isStock"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="flex flex-row items-start space-x-3 pb-2  space-y-0 rounded-md border p-4">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -544,7 +577,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               control={form.control}
               name="isFeatured"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="flex flex-row items-start space-x-3 pb-2 space-y-0 rounded-md border p-4">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -566,7 +599,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               control={form.control}
               name="isArchived"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="flex flex-row items-start space-x-3 pb-2 space-y-0 rounded-md border p-4">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -585,7 +618,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               )}
             />
           </div>
-          <div className="md:grid md:grid-cols-2 gap-8"></div>
           <div className="flex space-x-4">
             <Button disabled={loading || isProductId} type="submit">
               {action}

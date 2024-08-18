@@ -143,6 +143,7 @@ model Product {
   subCategoryId String?
   subCategory SubCategory? @relation("SubCategoryToProduct", fields: [subCategoryId], references: [id]) 
   name        String
+  sku         String
   price       Decimal  
   isPriceOffer Boolean @default(false)
   priceOffer  Decimal? 
@@ -218,11 +219,15 @@ model ProductVariant {
   name         String
   sku          String    
   price        Decimal?
-  stock        String?
+  isPriceOffer Boolean @default(false)
+  priceOffer   Decimal? 
+  isStock      Boolean @default(false)
+  stock        Int?
   colorId      String?   
   color        Color?  @relation(fields: [colorId], references: [id])
   attributes   VariantAttribute[] 
   images       Image[] 
+  isFeatured  Boolean   @default(false)
   isArchived  Boolean   @default(false)
 
   createdAt   DateTime  @default(now())

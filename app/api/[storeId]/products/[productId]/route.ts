@@ -85,6 +85,7 @@ export async function PATCH(
       categoryId,
       subCategoryId,
       name,
+      sku,
       price,
       priceOffer,
       isPriceOffer,
@@ -106,6 +107,10 @@ export async function PATCH(
     }
 
     if (!name) {
+      return new NextResponse("Nombre es requerido", { status: 400 });
+    }
+
+    if (!sku) {
       return new NextResponse("Nombre es requerido", { status: 400 });
     }
 
@@ -140,6 +145,7 @@ export async function PATCH(
       },
       data: {
         name,
+        sku,
         price,
         isPriceOffer,
         priceOffer,

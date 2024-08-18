@@ -16,6 +16,7 @@ export async function POST(
       categoryId,
       subCategoryId,
       name,
+      sku,
       price,
       priceOffer,
       isPriceOffer,
@@ -38,6 +39,10 @@ export async function POST(
 
     if (!name) {
       return new NextResponse("Nombre es requerido", { status: 400 });
+    }
+
+    if (!sku) {
+      return new NextResponse("SKU es requerido", { status: 400 });
     }
 
     if (!images || !images.length) {
@@ -80,6 +85,7 @@ export async function POST(
     const product = await prismadb.product.create({
       data: {
         name,
+        sku,
         price,
         isPriceOffer,
         priceOffer,
