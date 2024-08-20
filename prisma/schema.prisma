@@ -175,7 +175,7 @@ model Attribute {
   values      AttributeValue[] @relation("AttributeValueToAttribute")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
+  variants    VariantAttribute[]
   @@index([storeId])
 }
 model AttributeValue {
@@ -197,6 +197,8 @@ model VariantAttribute {
   id                String            @id @default(uuid())
   storeId           String            // Foreign Key to Store
   store             Store             @relation("StoreToVariantAttribute", fields: [storeId], references: [id])
+  attributeId       String    
+  attribute         Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
   productVariantId  String            // Foreign Key to ProductVariant
   productVariant    ProductVariant    @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
   attributeValueId  String            // Foreign Key to AttributeValue
@@ -205,10 +207,11 @@ model VariantAttribute {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  @@unique([productVariantId, attributeValueId]) // Para evitar duplicados
-  @@index([storeId])
-  @@index([productVariantId])
-  @@index([attributeValueId])
+   @@unique([attributeId,attributeValueId]) // Para evitar duplicados
+   @@index([storeId])
+   @@index([productVariantId])
+   @@index([attributeValueId])
+   @@index([attributeId])
 }
 model ProductVariant {
   id          String    @id @default(uuid())
