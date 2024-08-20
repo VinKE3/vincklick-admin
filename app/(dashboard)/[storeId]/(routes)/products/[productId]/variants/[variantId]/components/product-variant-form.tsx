@@ -48,6 +48,13 @@ const formSchema = z.object({
     .object({ url: z.string() }, { message: "Requerido" })
     .array()
     .min(1, { message: "Requerido" }),
+  attributes: z
+    .object(
+      { attributeId: z.string(), attributeValueId: z.string() },
+      { message: "Requerido" }
+    )
+    .array()
+    .min(1, { message: "Requerido" }),
   price: z.coerce.number().min(1, { message: "Requerido" }),
   stock: z.coerce
     .number()
@@ -64,24 +71,46 @@ const formSchema = z.object({
   colorId: z.string().optional().nullable(),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
+  attributeId: z.string().min(1, { message: "Requerido" }),
+  attributeValueId: z.string().min(1, { message: "Requerido" }),
 });
 
 type ProductVariantFormValues = z.infer<typeof formSchema>;
+
+interface AttributeValue {
+  id: string;
+  storeId: string;
+  value: string;
+  attributeId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+interface Attribute {
+  id: string;
+  storeId: string;
+  name: string;
+  values: AttributeValue[];
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface ProductVariantFormProps {
   initialData:
     | (ProductVariant & {
         images: Image[];
+        attributes: VariantAttribute[];
       })
     | null;
   product: Product | null;
   colors: Color[];
+  attributes: Attribute[];
 }
 
 export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
   initialData,
   product,
   colors,
+  attributes,
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -116,6 +145,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
         name: "",
         sku: "",
         images: [],
+        attributes: [],
         price: 0,
         priceOffer: null,
         stock: null,
@@ -123,6 +153,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
         colorId: "",
         isFeatured: false,
         isArchived: false,
+        isPriceOffer: false,
       };
 
   const form = useForm<ProductVariantFormValues>({
@@ -134,6 +165,14 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
   const isPriceOffer = form.watch("isPriceOffer");
   const isFeatured = form.watch("isFeatured");
   const isArchived = form.watch("isArchived");
+
+  const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(
+    null
+  );
+
+  const handleAttributeChange = (attributeId: string) => {
+    setSelectedAttributeId(attributeId);
+  };
 
   useEffect(() => {
     if (!form.watch("isStock")) {
@@ -200,7 +239,11 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
 
     return `${productName}-${variantName}`;
   };
+  const watchValues = form.watch();
 
+  useEffect(() => {
+    console.log("Form Values Updated:", watchValues);
+  }, [watchValues]);
   return (
     <>
       <AlertModal
@@ -252,7 +295,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
               </FormItem>
             )}
           />
-          <div className="md:grid md:grid-cols-3 gap-8">
+          <div className="md:grid md:grid-cols-4 gap-8">
             <FormField
               control={form.control}
               name="name"
@@ -472,6 +515,77 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
                 </FormItem>
               )}
             />
+          </div>
+          <div className="md:grid md:grid-cols-4 gap-8">
+            <FormField
+              control={form.control}
+              name="attributeId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Atributo</FormLabel>
+                  <Select
+                    disabled={loading}
+                    value={field.value}
+                    defaultValue={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      handleAttributeChange(value);
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="Seleccionar Atributo"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {attributes.map((attribute) => (
+                        <SelectItem key={attribute.id} value={attribute.id}>
+                          {attribute.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {selectedAttributeId && (
+              <>
+                <FormItem>
+                  <FormLabel>Valores</FormLabel>
+                  <Select
+                    value={form.watch("attributeValueId")}
+                    onValueChange={(value) =>
+                      form.setValue("attributeValueId", value)
+                    }
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={form.watch("attributeValueId")}
+                          placeholder="Seleccionar Valor"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {attributes
+                        ?.find((attr) => attr.id === selectedAttributeId)
+                        ?.values.map((value) => (
+                          <SelectItem key={value.id} value={value.id}>
+                            {value.value}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+                <div className="mt-8">
+                  <Button>Agregar nuevo atributo</Button>
+                </div>
+              </>
+            )}
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}

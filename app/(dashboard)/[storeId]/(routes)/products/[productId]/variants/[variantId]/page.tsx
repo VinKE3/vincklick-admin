@@ -13,6 +13,7 @@ const ProductVariantPage = async ({
     },
     include: {
       images: true,
+      attributes: true,
     },
   });
   const product = await prismadb.product.findUnique({
@@ -25,11 +26,21 @@ const ProductVariantPage = async ({
       storeId: params.storeId,
     },
   });
+  const attributes = await prismadb.attribute.findMany({
+    where: {
+      storeId: params.storeId,
+    },
+    include: {
+      values: true,
+    },
+  });
+
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <ProductVariantForm
           initialData={productVariant}
+          attributes={attributes}
           colors={colors}
           product={product}
         />

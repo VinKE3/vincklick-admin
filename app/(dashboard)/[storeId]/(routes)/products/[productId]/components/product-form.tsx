@@ -147,6 +147,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         providerId: "",
         isFeatured: false,
         isArchived: false,
+        isPriceOffer: false,
       };
 
   const form = useForm<ProductFormValues>({
