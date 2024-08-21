@@ -2,14 +2,14 @@
 
 import * as z from "zod";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
-import { Attribute } from "@prisma/client";
+import { Attribute, AttributeValue } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
-
+import { useTranslation } from "next-i18next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,15 +23,31 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
+import Description from "@/components/pro/description";
+import Card from "@/components/common/card";
+import InputPro from "@/components/pro/input";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Requerido" }),
+  values: z
+    .array(
+      z
+        .object({
+          value: z.string().min(1, { message: "Requerido" }),
+        })
+        .required()
+    )
+    .min(1, { message: "Minimo 1" }),
 });
 
 type AttributeFormValues = z.infer<typeof formSchema>;
 
 interface AttributeFormProps {
-  initialData: Attribute | null;
+  initialData:
+    | (Attribute & {
+        values: AttributeValue[];
+      })
+    | null;
 }
 
 export const AttributeForm: React.FC<AttributeFormProps> = ({
@@ -39,7 +55,6 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
 }) => {
   const params = useParams();
   const router = useRouter();
-
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -57,13 +72,26 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
     defaultValues: initialData
       ? {
           name: initialData.name,
+          values: initialData.values,
         }
       : {
           name: "",
+          values: [{ value: "" }],
         },
+  });
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = form;
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "values",
   });
   const [attributeId, setAttributeId] = useState(initialData?.id || "");
   const [isAttributeId, setIsAttributeId] = useState(false);
+
   const onSubmit = async (data: AttributeFormValues) => {
     try {
       setLoading(true);
@@ -114,7 +142,13 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
   const handleCreateValues = () => {
     router.push(`/${params.storeId}/attributes/${attributeId}/values`);
   };
+  const { t } = useTranslation();
 
+  const watchValues = form.watch();
+
+  useEffect(() => {
+    console.log("Form Values Updated:", watchValues);
+  }, [watchValues]);
   return (
     <>
       <AlertModal
@@ -142,7 +176,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <div className="md:grid md:grid-cols-3 gap-8">
+          {/* <div className="md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}
               name="name"
@@ -160,6 +194,73 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                 </FormItem>
               )}
             />
+          </div> */}
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+            <Description
+              title={t("Atributo")}
+              details={
+                "Agregar su nombre de atributo e información necesaria desde aquí"
+              }
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
+            />
+
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <InputPro
+                label={t("Nombre")}
+                {...register("name", { required: "form:error-name-required" })}
+                error={t(errors.name?.message!)}
+                variant="outline"
+                className="mb-5"
+              />
+            </Card>
+          </div>
+          <div className="flex flex-wrap my-5 sm:my-8">
+            <Description
+              title={t("Valores de atributos")}
+              details={
+                "Agregar el valor de su atributo y la información necesaria desde aquí"
+              }
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
+            />
+
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <div>
+                {fields.map((item: any & { id: string }, index) => (
+                  <div
+                    className="py-5 border-b border-dashed border-border-200 last:border-0 md:py-8"
+                    key={item.id}
+                  >
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-5">
+                      <InputPro
+                        className="sm:col-span-2"
+                        label={t("Valor")}
+                        variant="outline"
+                        {...register(`values.${index}.value` as const)}
+                        defaultValue={item.value!} // make sure to set up defaultValue
+                        // @ts-ignore
+                        error={t(errors?.values?.[index]?.value?.message)}
+                      />
+
+                      <button
+                        onClick={() => remove(index)}
+                        type="button"
+                        className="text-sm text-red-500 transition-colors duration-200 hover:text-red-700 focus:outline-none sm:col-span-1 sm:mt-4"
+                      >
+                        {t("Eliminar")}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                type="button"
+                onClick={() => append({ value: "" })}
+                className="w-full sm:w-auto"
+              >
+                {t("Agregar")}
+              </Button>
+            </Card>
           </div>
           <div className="flex space-x-4">
             <Button disabled={loading || isAttributeId} type="submit">
@@ -171,7 +272,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                 className="bg-green-600 hover:bg-green-800"
                 onClick={handleCreateValues}
               >
-                Crear Valores
+                Ver Tabla de Valores
               </Button>
             )}
           </div>

@@ -184,7 +184,7 @@ model AttributeValue {
   store       Store     @relation("StoreToAttributeValue", fields: [storeId], references: [id])
   value       String        // Ej: "64GB", "128GB", "4GB"
   attributeId String        // Foreign Key to Attribute
-  attribute   Attribute     @relation("AttributeValueToAttribute",fields: [attributeId], references: [id])
+  attribute   Attribute     @relation("AttributeValueToAttribute",fields: [attributeId], references: [id], onDelete: Cascade)
   variants    VariantAttribute[]
 
   createdAt   DateTime      @default(now())

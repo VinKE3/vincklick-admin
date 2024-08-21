@@ -76,7 +76,7 @@ export async function PATCH(
 
     const body = await req.json();
 
-    const { name } = body;
+    const { name, values } = body;
 
     if (!userId) {
       return new NextResponse("No autorizado", { status: 403 });
@@ -101,18 +101,38 @@ export async function PATCH(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
+    await prismadb.attribute.update({
+      where: {
+        id: params.attributeId,
+      },
+      data: {
+        name,
+        values: {
+          deleteMany: {},
+        },
+      },
+    });
+
     const attribute = await prismadb.attribute.update({
       where: {
         id: params.attributeId,
       },
       data: {
         name,
+        values: {
+          createMany: {
+            data: values.map((value: { value: string }) => ({
+              value: value.value, // Asegúrate de que `value` sea una cadena
+              storeId: params.storeId, // Incluye el storeId si es necesario
+            })),
+          },
+        },
       },
     });
 
     return NextResponse.json(attribute);
   } catch (error) {
-    console.log("[BANNER_PATCH]", error);
+    console.log("[ATTRIBUTE_PATCH]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

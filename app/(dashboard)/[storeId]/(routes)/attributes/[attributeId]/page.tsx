@@ -11,6 +11,9 @@ const AttributePage = async ({
     where: {
       id: params.attributeId,
     },
+    include: {
+      values: true,
+    },
   });
 
   return (
