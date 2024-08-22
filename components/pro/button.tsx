@@ -29,7 +29,7 @@ const classes = {
   big: "px-10 py-0 h-14",
 };
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const ButtonPro = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (props, ref) => {
     const {
       className,
@@ -79,6 +79,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 
-Button.displayName = "Button";
+ButtonPro.displayName = "Button";
 
-export default Button;
+export default ButtonPro;

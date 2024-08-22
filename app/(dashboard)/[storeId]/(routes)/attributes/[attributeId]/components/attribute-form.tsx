@@ -17,6 +17,8 @@ import { AlertModal } from "@/components/modals/alert-modal";
 import Description from "@/components/pro/description";
 import Card from "@/components/common/card";
 import InputPro from "@/components/pro/input";
+import StickyFooterPanel from "@/components/pro/sticky-footer-panel";
+import ButtonPro from "@/components/pro/button";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Requerido" }),
@@ -72,7 +74,6 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
   });
   const {
     register,
-    handleSubmit,
     control,
     formState: { errors },
   } = form;
@@ -224,16 +225,37 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                 ))}
               </div>
 
-              <Button
+              <ButtonPro
                 type="button"
                 onClick={() => append({ value: "" })}
                 className="w-full sm:w-auto"
               >
                 {"Agregar"}
-              </Button>
+              </ButtonPro>
             </Card>
           </div>
-          <div className="flex space-x-4">
+          <StickyFooterPanel className="z-0">
+            <div className="text-end">
+              {initialData && (
+                <ButtonPro
+                  variant="outline"
+                  onClick={router.back}
+                  className="text-sm me-4 md:text-base"
+                  type="button"
+                >
+                  {"form:button-label-back"}
+                </ButtonPro>
+              )}
+
+              <ButtonPro className="text-sm md:text-base">
+                {initialData
+                  ? "form:item-description-update"
+                  : "form:item-description-add"}{" "}
+                {"Atributo"}
+              </ButtonPro>
+            </div>
+          </StickyFooterPanel>
+          {/* <div className="flex space-x-4">
             <Button disabled={loading || isAttributeId} type="submit">
               {action}
             </Button>
@@ -246,7 +268,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                 Ver Tabla de Valores
               </Button>
             )}
-          </div>
+          </div> */}
         </form>
       </Form>
     </>

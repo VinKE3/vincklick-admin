@@ -31,6 +31,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ImageUpload from "@/components/ui/image-upload";
+import Description from "@/components/pro/description";
+import Card from "@/components/common/card";
+import InputPro from "@/components/pro/input";
 
 const formSchema = z.object({
   name: z.string().min(1, {
