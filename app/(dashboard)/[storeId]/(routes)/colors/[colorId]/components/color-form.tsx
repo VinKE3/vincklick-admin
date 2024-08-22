@@ -9,8 +9,6 @@ import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
 import { Color } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
-
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -27,7 +25,8 @@ import { SketchPicker } from "react-color";
 import Description from "@/components/pro/description";
 import Card from "@/components/common/card";
 import InputPro from "@/components/pro/input";
-
+import ButtonPro from "@/components/pro/button";
+import StickyFooterPanel from "@/components/pro/sticky-footer-panel";
 const formSchema = z.object({
   name: z.string().min(2, { message: "Requerido" }),
   value: z
@@ -59,7 +58,6 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
     ? "Edit un Color Existente."
     : "Agreagar Nuevo Color";
   const toastMessage = initialData ? "Color Actualizado." : "Color Creado.";
-  const action = initialData ? "Guardar Cambios" : "Crear";
 
   const form = useForm<ColorFormValues>({
     resolver: zodResolver(formSchema),
@@ -70,17 +68,15 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
   });
   const {
     register,
-    handleSubmit,
-    control,
     formState: { errors },
   } = form;
   const [selectedColor, setSelectedColor] = useState<string>(
     initialData?.value || "#"
-  ); // Color picker state
+  );
 
   const handleColorChange = (color: { hex: string }) => {
-    setSelectedColor(color.hex); // Update the selected color
-    form.setValue("value", color.hex); // Update the form value
+    setSelectedColor(color.hex);
+    form.setValue("value", color.hex);
   };
 
   const onSubmit = async (data: ColorFormValues) => {
@@ -183,46 +179,6 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
                   style={{ backgroundColor: form.getValues("value") }}
                 />
               </div>
-              {/* <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={loading}
-                        placeholder="Nombre del Color"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="value"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center gap-x-4">
-                        <Input
-                          disabled={loading}
-                          placeholder="Valor del Color"
-                          {...field}
-                        />
-                        <div
-                          className="border p-4 rounded-full"
-                          style={{ backgroundColor: field.value }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
               <FormField
                 control={form.control}
                 name="value"
@@ -241,11 +197,25 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
                   </FormItem>
                 )}
               />
-              <Button disabled={loading} className="ml-auto mt-4" type="submit">
-                {action}
-              </Button>
             </Card>
           </div>
+          <StickyFooterPanel className="z-0">
+            <div className="text-end">
+              {initialData && (
+                <ButtonPro
+                  variant="outline"
+                  onClick={router.back}
+                  className="text-sm me-4 md:text-base"
+                  type="button"
+                >
+                  {"Volver"}
+                </ButtonPro>
+              )}
+              <ButtonPro disabled={loading} className="text-sm md:text-base">
+                {initialData ? "Actualizar" : "Agregar"} {"Color"}
+              </ButtonPro>
+            </div>
+          </StickyFooterPanel>
         </form>
       </Form>
     </>

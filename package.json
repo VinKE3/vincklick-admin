@@ -65,6 +65,7 @@
     "react-hook-form": "^7.51.5",
     "react-hot-toast": "^2.4.1",
     "react-resizable-panels": "^2.0.19",
+    "react-select": "^5.8.0",
     "react-spinners": "^0.13.8",
     "recharts": "^2.12.7",
     "sonner": "^1.4.41",

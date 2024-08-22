@@ -8,16 +8,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
@@ -25,7 +17,8 @@ import { Provider } from "@prisma/client";
 import Description from "@/components/pro/description";
 import Card from "@/components/common/card";
 import InputPro from "@/components/pro/input";
-
+import ButtonPro from "@/components/pro/button";
+import StickyFooterPanel from "@/components/pro/sticky-footer-panel";
 const formSchema = z.object({
   name: z.string().min(1, {
     message: "Requerido",
@@ -56,7 +49,6 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({ initialData }) => {
   const toastMessage = initialData
     ? "Proveedor Actualizado."
     : "Proveedor Creado.";
-  const action = initialData ? "Guardar Cambios" : "Crear";
 
   const form = useForm<ProviderFormValues>({
     resolver: zodResolver(formSchema),
@@ -70,8 +62,6 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({ initialData }) => {
   });
   const {
     register,
-    handleSubmit,
-    control,
     formState: { errors },
   } = form;
   const onSubmit = async (data: ProviderFormValues) => {
@@ -150,7 +140,6 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({ initialData }) => {
               details={"Agregue la información sobre el proveedor."}
               className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
             />
-
             <Card className="w-full sm:w-8/12 md:w-2/3">
               <InputPro
                 label={"Nombre"}
@@ -200,103 +189,25 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({ initialData }) => {
                 variant="outline"
                 className="mb-5"
               />
-            </Card>
-            <Button disabled={loading} className="ml-auto mt-4" type="submit">
-              {action}
-            </Button>
+            </Card>{" "}
           </div>
-          {/* <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={loading}
-                    placeholder="ej: Aquiles Bailo"
-                    {...field}
-                    value={field.value || ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="contactName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre de contacto</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={loading}
-                    placeholder="Nombre de contacto"
-                    {...field}
-                    value={field.value || ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="md:grid md:grid-cols-2 gap-8">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="ej: algo@gmail.com"
-                      {...field}
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+          <StickyFooterPanel className="z-0">
+            <div className="text-end">
+              {initialData && (
+                <ButtonPro
+                  variant="outline"
+                  onClick={router.back}
+                  className="text-sm me-4 md:text-base"
+                  type="button"
+                >
+                  {"Volver"}
+                </ButtonPro>
               )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Teléfono</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="999999999"
-                      {...field}
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />{" "}
-          </div>
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Direccíon</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={loading}
-                    placeholder="ej: calle falsa 123"
-                    {...field}
-                    value={field.value || ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
+              <ButtonPro disabled={loading} className="text-sm md:text-base">
+                {initialData ? "Actualizar" : "Agregar"} {"Proveedor"}
+              </ButtonPro>
+            </div>
+          </StickyFooterPanel>
         </form>
       </Form>
     </>
