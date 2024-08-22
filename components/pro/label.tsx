@@ -11,7 +11,7 @@ const Label: React.FC<Props> = ({ className, ...rest }) => {
     <label
       className={twMerge(
         cn(
-          "flex text-body-dark font-semibold dark:text-black text-sm leading-none mb-3",
+          "flex text-body-dark font-semibold dark:text-white text-sm leading-none mb-3",
           className
         )
       )}

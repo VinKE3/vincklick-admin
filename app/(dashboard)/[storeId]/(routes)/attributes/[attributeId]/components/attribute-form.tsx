@@ -9,17 +9,8 @@ import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
 import { Attribute, AttributeValue } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
-import { useTranslation } from "next-i18next";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
@@ -142,7 +133,6 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
   const handleCreateValues = () => {
     router.push(`/${params.storeId}/attributes/${attributeId}/values`);
   };
-  const { t } = useTranslation();
 
   const watchValues = form.watch();
 
@@ -176,28 +166,9 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          {/* <div className="md:grid md:grid-cols-3 gap-8">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Nombre del Atributo"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div> */}
           <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
-              title={t("Atributo")}
+              title={"Atributo"}
               details={
                 "Agregar su nombre de atributo e información necesaria desde aquí"
               }
@@ -206,9 +177,9 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
 
             <Card className="w-full sm:w-8/12 md:w-2/3">
               <InputPro
-                label={t("Nombre")}
+                label={"Nombre"}
                 {...register("name", { required: "form:error-name-required" })}
-                error={t(errors.name?.message!)}
+                error={errors.name?.message!}
                 variant="outline"
                 className="mb-5"
               />
@@ -216,7 +187,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
           </div>
           <div className="flex flex-wrap my-5 sm:my-8">
             <Description
-              title={t("Valores de atributos")}
+              title={"Valores de atributos"}
               details={
                 "Agregar el valor de su atributo y la información necesaria desde aquí"
               }
@@ -233,12 +204,12 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-5">
                       <InputPro
                         className="sm:col-span-2"
-                        label={t("Valor")}
+                        label={"Valor"}
                         variant="outline"
                         {...register(`values.${index}.value` as const)}
                         defaultValue={item.value!} // make sure to set up defaultValue
                         // @ts-ignore
-                        error={t(errors?.values?.[index]?.value?.message)}
+                        error={errors?.values?.[index]?.value?.message}
                       />
 
                       <button
@@ -246,7 +217,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                         type="button"
                         className="text-sm text-red-500 transition-colors duration-200 hover:text-red-700 focus:outline-none sm:col-span-1 sm:mt-4"
                       >
-                        {t("Eliminar")}
+                        {"Eliminar"}
                       </button>
                     </div>
                   </div>
@@ -258,7 +229,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                 onClick={() => append({ value: "" })}
                 className="w-full sm:w-auto"
               >
-                {t("Agregar")}
+                {"Agregar"}
               </Button>
             </Card>
           </div>

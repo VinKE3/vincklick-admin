@@ -8,13 +8,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,8 +21,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
-import ImageUpload from "@/components/ui/image-upload";
 import { Provider } from "@prisma/client";
+import Description from "@/components/pro/description";
+import Card from "@/components/common/card";
+import InputPro from "@/components/pro/input";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -73,7 +68,12 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({ initialData }) => {
       address: "",
     },
   });
-
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = form;
   const onSubmit = async (data: ProviderFormValues) => {
     try {
       setLoading(true);
@@ -144,7 +144,68 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({ initialData }) => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <FormField
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+            <Description
+              title={"Descripción"}
+              details={"Agregue la información sobre el proveedor."}
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
+            />
+
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <InputPro
+                label={"Nombre"}
+                {...register("name", { required: "form:error-name-required" })}
+                error={errors.name?.message!}
+                placeholder="Nombre"
+                variant="outline"
+                className="mb-5"
+              />
+              <InputPro
+                label={"Nombre de Contacto"}
+                {...register("contactName", {
+                  required: "form:error-name-required",
+                })}
+                error={errors.name?.message!}
+                placeholder="Nombre de Contacto"
+                variant="outline"
+                className="mb-5"
+              />
+              <InputPro
+                label={"Email"}
+                {...register("email", {
+                  required: "form:error-name-required",
+                })}
+                error={errors.name?.message!}
+                placeholder="Email"
+                variant="outline"
+                className="mb-5"
+              />
+              <InputPro
+                label={"Teléfono"}
+                {...register("phone", {
+                  required: "form:error-name-required",
+                })}
+                error={errors.name?.message!}
+                placeholder="123456789"
+                variant="outline"
+                className="mb-5"
+              />
+              <InputPro
+                label={"Dirección"}
+                {...register("address", {
+                  required: "form:error-name-required",
+                })}
+                error={errors.name?.message!}
+                placeholder="Calle falsa 123"
+                variant="outline"
+                className="mb-5"
+              />
+            </Card>
+            <Button disabled={loading} className="ml-auto mt-4" type="submit">
+              {action}
+            </Button>
+          </div>
+          {/* <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
@@ -235,10 +296,7 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({ initialData }) => {
                 <FormMessage />
               </FormItem>
             )}
-          />
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
+          /> */}
         </form>
       </Form>
     </>
