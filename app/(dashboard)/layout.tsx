@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
 import Header from "@/components/layout/header";
 import Sidebar from "@/components/layout/sidebar";
+import Footer from "@/components/footer";
 
 export default async function DashboardLayout({
   children,
@@ -34,7 +35,10 @@ export default async function DashboardLayout({
       <Header />
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
-        <main className="w-full pt-16 overflow-y-scroll ">{children}</main>
+        <div className="flex flex-col w-full">
+          <main className="flex-grow pt-16 overflow-y-scroll">{children}</main>
+          <Footer />
+        </div>
       </div>
     </>
   );

@@ -37,15 +37,6 @@ export const AttibutesValuesClient: React.FC<SubCategoriesClientProps> = ({
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Ver Atributo
           </Button>
-          <Button
-            onClick={() =>
-              router.push(
-                `/${params.storeId}/attributes/${params.attributeId}/values/new`
-              )
-            }
-          >
-            <Plus className="mr-2 h-4 w-4" /> Nuevo
-          </Button>
         </div>
       </div>
       <Separator />

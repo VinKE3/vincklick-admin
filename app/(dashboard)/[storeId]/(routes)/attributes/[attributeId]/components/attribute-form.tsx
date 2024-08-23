@@ -208,7 +208,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                         label={"Valor"}
                         variant="outline"
                         {...register(`values.${index}.value` as const)}
-                        defaultValue={item.value!} // make sure to set up defaultValue
+                        defaultValue={item.value!}
                         // @ts-ignore
                         error={errors?.values?.[index]?.value?.message}
                       />
@@ -243,32 +243,24 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                   className="text-sm me-4 md:text-base"
                   type="button"
                 >
-                  {"form:button-label-back"}
+                  {"Volver"}
+                </ButtonPro>
+              )}
+              {attributeId && (
+                <ButtonPro
+                  type="button"
+                  className="text-sm me-4 md:text-base bg-green-600 hover:bg-green-800"
+                  onClick={handleCreateValues}
+                >
+                  Ver Tabla de Valores
                 </ButtonPro>
               )}
 
               <ButtonPro className="text-sm md:text-base">
-                {initialData
-                  ? "form:item-description-update"
-                  : "form:item-description-add"}{" "}
-                {"Atributo"}
+                {initialData ? "Actualizar" : "Agregar"} {"Atributo"}
               </ButtonPro>
             </div>
           </StickyFooterPanel>
-          {/* <div className="flex space-x-4">
-            <Button disabled={loading || isAttributeId} type="submit">
-              {action}
-            </Button>
-            {attributeId && (
-              <Button
-                type="button"
-                className="bg-green-600 hover:bg-green-800"
-                onClick={handleCreateValues}
-              >
-                Ver Tabla de Valores
-              </Button>
-            )}
-          </div> */}
         </form>
       </Form>
     </>
