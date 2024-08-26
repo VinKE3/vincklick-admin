@@ -30,6 +30,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Description from "@/components/pro/description";
+import Card from "@/components/common/card";
+import InputPro from "@/components/pro/input";
+import StickyFooterPanel from "@/components/pro/sticky-footer-panel";
+import ButtonPro from "@/components/pro/button";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Requerido" }),
@@ -69,7 +74,10 @@ export const SubCategoryForm: React.FC<SubCategoryFormProps> = ({
       categoryId: "",
     },
   });
-
+  const {
+    register,
+    formState: { errors },
+  } = form;
   const onSubmit = async (data: SubCategoryFormValues) => {
     try {
       setLoading(true);
@@ -141,7 +149,84 @@ export const SubCategoryForm: React.FC<SubCategoryFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <div className="md:grid md:grid-cols-3 gap-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+            <Description
+              title={"SubCategoría"}
+              details={"Agregar el nombre de la Subcategoría"}
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
+            />
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <InputPro
+                label={"Nombre SubCategoría"}
+                {...register("name", { required: "form:error-name-required" })}
+                error={errors.name?.message!}
+                variant="outline"
+                className="mb-5"
+              />
+            </Card>
+          </div>
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+            <Description
+              title={"Categoría Padre"}
+              details={
+                "Seleccione la categoría Padre asociada a esta subcategoría"
+              }
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
+            />
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <FormField
+                control={form.control}
+                name="categoryId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Categoria Padre</FormLabel>
+                    <Select
+                      disabled={loading}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            defaultValue={field.value}
+                            placeholder="Seleccionar Categoría"
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Card>
+          </div>
+          <StickyFooterPanel className="z-0">
+            <div className="text-end">
+              {initialData && (
+                <ButtonPro
+                  variant="outline"
+                  onClick={router.back}
+                  className="text-sm me-4 md:text-base"
+                  type="button"
+                >
+                  {"Volver"}
+                </ButtonPro>
+              )}
+
+              <ButtonPro className="text-sm md:text-base">
+                {initialData ? "Actualizar" : "Agregar"} {"SubCategoría"}
+              </ButtonPro>
+            </div>
+          </StickyFooterPanel>
+          {/* <div className="md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}
               name="name"
@@ -191,10 +276,10 @@ export const SubCategoryForm: React.FC<SubCategoryFormProps> = ({
                 </FormItem>
               )}
             />
-          </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
+          </div> */}
+          {/* <Button disabled={loading} className="ml-auto" type="submit">
             {action}
-          </Button>
+          </Button> */}
         </form>
       </Form>
     </>

@@ -157,7 +157,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
             <Description
               title={"Categoría"}
               details={"Agregar el nombre de la categoría"}
@@ -191,7 +191,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
               />
             </Card>
           </div>
-          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
             <Description
               title={"Banner"}
               details={"Seleccione el Banner de la categoría"}
@@ -232,7 +232,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
               />
             </Card>
           </div>
-          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
             <Description
               title={"Color"}
               details={"Seleccione el Color de fondo de la categoría"}
@@ -291,9 +291,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
               </ButtonPro>
             </div>
           </StickyFooterPanel>
-          {/* <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button> */}
         </form>
       </Form>
     </>

@@ -10,7 +10,7 @@ const Card: React.FC<Props> = ({ className, ...props }) => {
     <div
       className={twMerge(
         cn(
-          "rounded bg-zinc-50 dark:bg-black dark:border dark:border-slate-300 p-5 shadow md:p-8",
+          "rounded bg-zinc-50 dark:bg-black dark:border dark:border-slate-300 p-5 shadow",
           className
         )
       )}
