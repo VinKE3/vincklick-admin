@@ -82,7 +82,6 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
     name: "values",
   });
   const [attributeId, setAttributeId] = useState(initialData?.id || "");
-  const [isAttributeId, setIsAttributeId] = useState(false);
 
   const onSubmit = async (data: AttributeFormValues) => {
     try {
@@ -100,7 +99,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
       //?Almacenar el ID del atributo después de la creación
       const id = response.data.id;
       setAttributeId(id);
-      setIsAttributeId(true);
+
       toast.success(toastMessage);
     } catch (error: any) {
       const errorMessage =
@@ -135,11 +134,6 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
     router.push(`/${params.storeId}/attributes/${attributeId}/values`);
   };
 
-  const watchValues = form.watch();
-
-  useEffect(() => {
-    console.log("Form Values Updated:", watchValues);
-  }, [watchValues]);
   return (
     <>
       <AlertModal
@@ -235,7 +229,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
             </Card>
           </div>
           <StickyFooterPanel className="z-0">
-            <div className="text-end">
+            <div className="text-end space-y-2">
               {initialData && (
                 <ButtonPro
                   variant="outline"
@@ -248,6 +242,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
               )}
               {attributeId && (
                 <ButtonPro
+                  disabled={loading}
                   type="button"
                   className="text-sm me-4 md:text-base bg-green-600 hover:bg-green-800"
                   onClick={handleCreateValues}
@@ -256,7 +251,7 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                 </ButtonPro>
               )}
 
-              <ButtonPro className="text-sm md:text-base">
+              <ButtonPro disabled={loading} className="text-sm md:text-base">
                 {initialData ? "Actualizar" : "Agregar"} {"Atributo"}
               </ButtonPro>
             </div>

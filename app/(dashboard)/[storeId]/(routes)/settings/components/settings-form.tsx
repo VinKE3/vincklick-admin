@@ -25,6 +25,11 @@ import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { ApiAlert } from "@/components/ui/api-alert";
 import { useOrigin } from "@/hooks/use-origin";
+import Description from "@/components/pro/description";
+import Card from "@/components/common/card";
+import InputPro from "@/components/pro/input";
+import StickyFooterPanel from "@/components/pro/sticky-footer-panel";
+import ButtonPro from "@/components/pro/button";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Mínimo 2 letras" }),
@@ -48,7 +53,10 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
   });
-
+  const {
+    register,
+    formState: { errors },
+  } = form;
   const onSubmit = async (data: SettingsFormValues) => {
     try {
       setLoading(true);
@@ -107,28 +115,43 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <div className="grid grid-cols-3 gap-8">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Nombre de la Tienda"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
+            <Description
+              title={"Configuración"}
+              details={"Gestione el nombre de la tienda"}
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
             />
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <InputPro
+                label={"Nombre"}
+                {...register("name", { required: "form:error-name-required" })}
+                error={errors.name?.message!}
+                variant="outline"
+                className="mb-5"
+              />
+            </Card>
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
+          <StickyFooterPanel className="z-0">
+            <div className="text-end">
+              {initialData && (
+                <ButtonPro
+                  variant="outline"
+                  onClick={router.back}
+                  className="text-sm me-4 md:text-base"
+                  type="button"
+                >
+                  {"Volver"}
+                </ButtonPro>
+              )}
+
+              <ButtonPro className="text-sm md:text-base">
+                {initialData ? "Actualizar" : "Agregar"} {"Tienda"}
+              </ButtonPro>
+            </div>
+          </StickyFooterPanel>
+          {/* <Button disabled={loading} className="ml-auto" type="submit">
             Guardar Cambios
-          </Button>
+          </Button> */}
         </form>
       </Form>
       <Separator />

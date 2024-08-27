@@ -182,6 +182,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
                   onClick={router.back}
                   className="text-sm me-4 md:text-base"
                   type="button"
+                  disabled={loading}
                 >
                   {"Volver"}
                 </ButtonPro>

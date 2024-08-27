@@ -24,7 +24,11 @@ import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
 import ImageUpload from "@/components/ui/image-upload";
-
+import Description from "@/components/pro/description";
+import Card from "@/components/common/card";
+import InputPro from "@/components/pro/input";
+import StickyFooterPanel from "@/components/pro/sticky-footer-panel";
+import ButtonPro from "@/components/pro/button";
 const formSchema = z.object({
   name: z.string().min(1, {
     message: "Requerido",
@@ -61,7 +65,10 @@ export const BrandForm: React.FC<BrandFormProps> = ({ initialData }) => {
       imageUrl: "",
     },
   });
-
+  const {
+    register,
+    formState: { errors },
+  } = form;
   const onSubmit = async (data: BrandFormValues) => {
     try {
       setLoading(true);
@@ -128,46 +135,59 @@ export const BrandForm: React.FC<BrandFormProps> = ({ initialData }) => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Icono Marca</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value ? [field.value] : []}
-                    disabled={loading}
-                    onChange={(url) => field.onChange(url)}
-                    onRemove={() => field.onChange("")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="md:grid md:grid-cols-3 gap-8">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Nombre Marca"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
+            <Description
+              title={"Marca"}
+              details={"Gestione las marcas de la tienda"}
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
             />
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem className="mb-6">
+                    <FormLabel>Imagen Background</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        value={field.value ? [field.value] : []}
+                        disabled={loading}
+                        onChange={(url) => field.onChange(url)}
+                        onRemove={() => field.onChange("")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <InputPro
+                label={"Nombre"}
+                {...register("name", { required: "form:error-name-required" })}
+                error={errors.name?.message!}
+                variant="outline"
+                className="mb-5"
+              />
+            </Card>
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
+          <StickyFooterPanel className="z-0">
+            <div className="text-end">
+              {initialData && (
+                <ButtonPro
+                  variant="outline"
+                  onClick={router.back}
+                  className="text-sm me-4 md:text-base"
+                  type="button"
+                  disabled={loading}
+                >
+                  {"Volver"}
+                </ButtonPro>
+              )}
+
+              <ButtonPro disabled={loading} className="text-sm md:text-base">
+                {initialData ? "Actualizar" : "Agregar"} {"Marca"}
+              </ButtonPro>
+            </div>
+          </StickyFooterPanel>
         </form>
       </Form>
     </>

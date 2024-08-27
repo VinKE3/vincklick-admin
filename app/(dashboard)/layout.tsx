@@ -35,8 +35,8 @@ export default async function DashboardLayout({
       <Header />
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
-        <div className="flex flex-col w-full">
-          <main className="flex-grow pt-16 overflow-y-scroll">{children}</main>
+        <div className="flex flex-col w-full h-full">
+          <main className="flex-grow pt-16 overflow-y-auto">{children}</main>
           <Footer />
         </div>
       </div>

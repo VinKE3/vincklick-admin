@@ -281,12 +281,13 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                   onClick={router.back}
                   className="text-sm me-4 md:text-base"
                   type="button"
+                  disabled={loading}
                 >
                   {"Volver"}
                 </ButtonPro>
               )}
 
-              <ButtonPro className="text-sm md:text-base">
+              <ButtonPro disabled={loading} className="text-sm md:text-base">
                 {initialData ? "Actualizar" : "Agregar"} {"Categoría"}
               </ButtonPro>
             </div>

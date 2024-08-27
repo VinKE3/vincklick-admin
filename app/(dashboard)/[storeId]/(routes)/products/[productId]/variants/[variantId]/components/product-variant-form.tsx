@@ -39,6 +39,11 @@ import {
 } from "@/components/ui/select";
 import ImageUpload from "@/components/ui/image-upload";
 import { Checkbox } from "@/components/ui/checkbox";
+import Description from "@/components/pro/description";
+import Card from "@/components/common/card";
+import InputPro from "@/components/pro/input";
+import StickyFooterPanel from "@/components/pro/sticky-footer-panel";
+import ButtonPro from "@/components/pro/button";
 
 const formSchema = z.object({
   productId: z.string().min(1, { message: "Requerido" }),
@@ -160,7 +165,10 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
-
+  const {
+    register,
+    formState: { errors },
+  } = form;
   const isStock = form.watch("isStock");
   const isPriceOffer = form.watch("isPriceOffer");
   const isFeatured = form.watch("isFeatured");
@@ -269,124 +277,213 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 w-full"
+          className="space-y-2 md:space-y-4 h-full w-full"
         >
-          <FormField
-            control={form.control}
-            name="images"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Imagenes</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value.map((image) => image.url)}
-                    disabled={loading}
-                    onChange={(url) =>
-                      field.onChange([...field.value, { url }])
-                    }
-                    onRemove={(url) =>
-                      field.onChange([
-                        ...field.value.filter((current) => current.url !== url),
-                      ])
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="md:grid md:grid-cols-4 gap-8">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Nombre de la variación de producto"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e); // Actualizar el valor del campo 'name'
-                        const generatedSku = automaticSku({
-                          nameVariant: e.target.value,
-                        });
-                        form.setValue("sku", generatedSku); // Generar y establecer el SKU
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
+            <Description
+              title={"Nombre e Imágen"}
+              details={"Gestiona el nombre del producto y sus imágenes"}
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
             />
-            <FormField
-              control={form.control}
-              name="sku"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>SKU</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={true}
-                      placeholder="SKU del producto"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Precio</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      disabled={loading}
-                      placeholder="9.99"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="colorId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Color</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value || ""}
-                    defaultValue={field.value || ""}
-                  >
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <FormField
+                control={form.control}
+                name="images"
+                render={({ field }) => (
+                  <FormItem className="mb-6">
+                    <FormLabel>Imagenes</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value || ""}
-                          placeholder="Seleccionar Color"
-                        />
-                      </SelectTrigger>
+                      <ImageUpload
+                        value={field.value.map((image) => image.url)}
+                        disabled={loading}
+                        onChange={(url) =>
+                          field.onChange([...field.value, { url }])
+                        }
+                        onRemove={(url) =>
+                          field.onChange([
+                            ...field.value.filter(
+                              (current) => current.url !== url
+                            ),
+                          ])
+                        }
+                      />
                     </FormControl>
-                    <SelectContent>
-                      {colors?.map((color) => (
-                        <SelectItem key={color.id} value={color.id}>
-                          {color.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InputPro
+                        label={"Nombre"}
+                        {...register("name", {
+                          required: "form:error-name-required",
+                        })}
+                        error={errors.name?.message!}
+                        variant="outline"
+                        className="mb-5"
+                        onChange={(e) => {
+                          field.onChange(e); // Actualizar el valor del campo 'name'
+                          const generatedSku = automaticSku({
+                            nameVariant: e.target.value,
+                          });
+                          form.setValue("sku", generatedSku); // Generar y establecer el SKU
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="sku"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InputPro
+                        {...field}
+                        label={"SKU"}
+                        disabled={true}
+                        {...register("sku", {
+                          required: "form:error-name-required",
+                        })}
+                        error={errors.sku?.message!}
+                        variant="outline"
+                        className="mb-5"
+                        onChange={(e) => {
+                          field.onChange(e); // Actualizar el valor del campo 'name'
+                          const generatedSku = automaticSku({
+                            nameVariant: e.target.value,
+                          });
+                          form.setValue("sku", generatedSku); // Generar y establecer el SKU
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InputPro
+                        label={"Precio"}
+                        type="number"
+                        {...register("price", {
+                          required: "form:error-name-required",
+                        })}
+                        error={errors.price?.message!}
+                        variant="outline"
+                        className="mb-5"
+                        placeholder="9.99"
+                        min={1}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Card>
+          </div>
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
+            <Description
+              title={"Opcionales"}
+              details={"Puede elegir o dejar en blanco las siguientes opciones"}
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
             />
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <FormField
+                control={form.control}
+                name="isPriceOffer"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 pb-2 mb-2 space-y-0 border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={(checked) => field.onChange(checked)}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Activar Precio Oferta</FormLabel>
+                      <FormDescription>
+                        Agrega un precio promocional
+                      </FormDescription>
+                    </div>
+                    {isPriceOffer && (
+                      <FormField
+                        control={form.control}
+                        name="priceOffer"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                disabled={loading}
+                                placeholder="Precio Oferta"
+                                {...field}
+                                value={field.value ?? 1}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isStock"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 pb-2 space-y-0 border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={(checked) => field.onChange(checked)}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Activar Stock</FormLabel>
+                      <FormDescription>
+                        Agrega el stock del producto
+                      </FormDescription>
+                    </div>
+                    {isStock && (
+                      <FormField
+                        control={form.control}
+                        name="stock"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                disabled={loading}
+                                placeholder="Stock"
+                                {...field}
+                                value={field.value ?? 1}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </FormItem>
+                )}
+              />
+            </Card>
           </div>
           <div className="md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <FormField
@@ -516,6 +613,38 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
               )}
             />
           </div>
+          <FormField
+            control={form.control}
+            name="colorId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Color</FormLabel>
+                <Select
+                  disabled={loading}
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                  defaultValue={field.value || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue
+                        defaultValue={field.value || ""}
+                        placeholder="Seleccionar Color"
+                      />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {colors?.map((color) => (
+                      <SelectItem key={color.id} value={color.id}>
+                        {color.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="md:grid md:grid-cols-4 gap-8">
             <FormField
               control={form.control}
