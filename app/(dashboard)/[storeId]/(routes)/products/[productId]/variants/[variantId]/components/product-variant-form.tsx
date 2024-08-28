@@ -46,38 +46,39 @@ import StickyFooterPanel from "@/components/pro/sticky-footer-panel";
 import ButtonPro from "@/components/pro/button";
 
 const formSchema = z.object({
-  productId: z.string().min(1, { message: "Requerido" }),
   name: z.string().min(1, { message: "Requerido" }),
   sku: z.string().min(1, { message: "Requerido" }),
-  images: z
-    .object({ url: z.string() }, { message: "Requerido" })
-    .array()
-    .min(1, { message: "Requerido" }),
-  attributes: z
-    .object(
-      { attributeId: z.string(), attributeValueId: z.string() },
-      { message: "Requerido" }
-    )
-    .array()
-    .min(1, { message: "Requerido" }),
   price: z.coerce.number().min(1, { message: "Requerido" }),
-  stock: z.coerce
-    .number()
-    .min(1, { message: "Minimo 1" })
-    .optional()
-    .nullable(),
-  isStock: z.boolean().default(false).optional(),
+  isPriceOffer: z.boolean().default(false).optional(),
   priceOffer: z.coerce
     .number()
     .min(1, { message: "Minimo 1" })
     .optional()
     .nullable(),
-  isPriceOffer: z.boolean().default(false).optional(),
+  isStock: z.boolean().default(false).optional(),
+  stock: z.coerce
+    .number()
+    .min(1, { message: "Minimo 1" })
+    .optional()
+    .nullable(),
   colorId: z.string().optional().nullable(),
+  // attributes: z
+  //   .array(
+  //     z
+  //       .object({
+  //         attributeId: z.string().min(1, { message: "Requerido" }),
+  //         attributeValueId: z.string().min(1, { message: "Requerido" }),
+  //       })
+  //       .required()
+  //   )
+  //   .array()
+  //   .min(1, { message: "Requerido" }),
+  images: z
+    .object({ url: z.string() }, { message: "Requerido" })
+    .array()
+    .min(1, { message: "Requerido" }),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
-  attributeId: z.string().min(1, { message: "Requerido" }),
-  attributeValueId: z.string().min(1, { message: "Requerido" }),
 });
 
 type ProductVariantFormValues = z.infer<typeof formSchema>;
@@ -133,7 +134,11 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
     ? "Variación de Producto Actualizada."
     : "Variación de Producto Creada.";
   const action = initialData ? "Guardar Cambios" : "Crear";
-
+  const [variantProductId, setVariantProduct] = useState(initialData?.id || "");
+  const [attributeId, setAttributeId] = useState(initialData?.id || "");
+  const [valueattributeId, setValueAttributeId] = useState(
+    initialData?.id || ""
+  );
   const defaultValues = initialData
     ? {
         ...initialData,
@@ -181,7 +186,9 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
   const handleAttributeChange = (attributeId: string) => {
     setSelectedAttributeId(attributeId);
   };
-
+  const handleTable = () => {
+    router.push(`/${params.storeId}/products/${params.productId}/variants`);
+  };
   useEffect(() => {
     if (!form.watch("isStock")) {
       form.setValue("stock", null);
@@ -396,6 +403,116 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
           </div>
           <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
             <Description
+              title={"Atributos"}
+              details={"Gestione los atributos de la variación de producto"}
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
+            />
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <FormField
+                control={form.control}
+                name="colorId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Color</FormLabel>
+                    <Select
+                      disabled={loading}
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                      defaultValue={field.value || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            defaultValue={field.value || ""}
+                            placeholder="Seleccionar Color"
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {colors?.map((color) => (
+                          <SelectItem key={color.id} value={color.id}>
+                            {color.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* <FormField
+                control={form.control}
+                name="attributeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Atributo</FormLabel>
+                    <Select
+                      disabled={loading}
+                      value={field.value}
+                      defaultValue={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        handleAttributeChange(value);
+                      }}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            defaultValue={field.value}
+                            placeholder="Seleccionar Atributo"
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {attributes.map((attribute) => (
+                          <SelectItem key={attribute.id} value={attribute.id}>
+                            {attribute.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {selectedAttributeId && (
+                <>
+                  <FormItem>
+                    <FormLabel>Valores</FormLabel>
+                    <Select
+                      value={form.watch("attributeValueId")}
+                      onValueChange={(value) =>
+                        form.setValue("attributeValueId", value)
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            defaultValue={form.watch("attributeValueId")}
+                            placeholder="Seleccionar Valor"
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {attributes
+                          ?.find((attr) => attr.id === selectedAttributeId)
+                          ?.values.map((value) => (
+                            <SelectItem key={value.id} value={value.id}>
+                              {value.value}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                  <div className="mt-8">
+                    <ButtonPro type="button">Agregar nuevo atributo</ButtonPro>
+                  </div>
+                </>
+              )} */}
+            </Card>
+          </div>
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
+            <Description
               title={"Opcionales"}
               details={"Puede elegir o dejar en blanco las siguientes opciones"}
               className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
@@ -485,240 +602,86 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
               />
             </Card>
           </div>
-          <div className="md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <FormField
-              control={form.control}
-              name="isPriceOffer"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 mb-2 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={(checked) => field.onChange(checked)}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Activar Precio Oferta</FormLabel>
-                    <FormDescription>
-                      Agrega un precio promocional
-                    </FormDescription>
-                  </div>
-                  {isPriceOffer && (
-                    <FormField
-                      control={form.control}
-                      name="priceOffer"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min="0"
-                              disabled={loading}
-                              placeholder="Precio Oferta"
-                              {...field}
-                              value={field.value ?? 1}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
-                </FormItem>
-              )}
+          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
+            <Description
+              title={"Estado"}
+              details={"Gestione si el producto aparecerá o no en la tienda"}
+              className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
             />
-            <FormField
-              control={form.control}
-              name="isStock"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 mb-2 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={(checked) => field.onChange(checked)}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Activar Stock</FormLabel>
-                    <FormDescription>
-                      Agrega el stock del producto
-                    </FormDescription>
-                  </div>
-                  {isStock && (
-                    <FormField
-                      control={form.control}
-                      name="stock"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min="0"
-                              disabled={loading}
-                              placeholder="Stock"
-                              {...field}
-                              value={field.value ?? 1}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="isFeatured"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 mb-2 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      // @ts-ignore
-                      onCheckedChange={field.onChange}
-                      disabled={isArchived}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Destacado</FormLabel>
-                    <FormDescription>
-                      Este producto aparecerá en la sección de destacados.
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="isArchived"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 mb-2 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      // @ts-ignore
-                      onCheckedChange={field.onChange}
-                      disabled={isFeatured}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Archivado</FormLabel>
-                    <FormDescription>
-                      Este producto no aparecerá en la tienda.
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={form.control}
-            name="colorId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Color</FormLabel>
-                <Select
-                  disabled={loading}
-                  onValueChange={field.onChange}
-                  value={field.value || ""}
-                  defaultValue={field.value || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue
-                        defaultValue={field.value || ""}
-                        placeholder="Seleccionar Color"
+            <Card className="w-full sm:w-8/12 md:w-2/3">
+              <FormField
+                control={form.control}
+                name="isFeatured"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 pb-2 space-y-0 mb-2 border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        // @ts-ignore
+                        onCheckedChange={field.onChange}
+                        disabled={isArchived}
                       />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {colors?.map((color) => (
-                      <SelectItem key={color.id} value={color.id}>
-                        {color.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="md:grid md:grid-cols-4 gap-8">
-            <FormField
-              control={form.control}
-              name="attributeId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Atributo</FormLabel>
-                  <Select
-                    disabled={loading}
-                    value={field.value}
-                    defaultValue={field.value}
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      handleAttributeChange(value);
-                    }}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Seleccionar Atributo"
-                        />
-                      </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      {attributes.map((attribute) => (
-                        <SelectItem key={attribute.id} value={attribute.id}>
-                          {attribute.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {selectedAttributeId && (
-              <>
-                <FormItem>
-                  <FormLabel>Valores</FormLabel>
-                  <Select
-                    value={form.watch("attributeValueId")}
-                    onValueChange={(value) =>
-                      form.setValue("attributeValueId", value)
-                    }
-                  >
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Destacado</FormLabel>
+                      <FormDescription>
+                        Este producto aparecerá en la sección de destacados.
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isArchived"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 pb-2 space-y-0 border p-4">
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={form.watch("attributeValueId")}
-                          placeholder="Seleccionar Valor"
-                        />
-                      </SelectTrigger>
+                      <Checkbox
+                        checked={field.value}
+                        // @ts-ignore
+                        onCheckedChange={field.onChange}
+                        disabled={isFeatured}
+                      />
                     </FormControl>
-                    <SelectContent>
-                      {attributes
-                        ?.find((attr) => attr.id === selectedAttributeId)
-                        ?.values.map((value) => (
-                          <SelectItem key={value.id} value={value.id}>
-                            {value.value}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-                <div className="mt-8">
-                  <Button>Agregar nuevo atributo</Button>
-                </div>
-              </>
-            )}
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Archivado</FormLabel>
+                      <FormDescription>
+                        Este producto no aparecerá en la tienda.
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </Card>
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
+          <StickyFooterPanel className="z-0">
+            <div className="text-end space-y-2">
+              {initialData && (
+                <ButtonPro
+                  variant="outline"
+                  onClick={router.back}
+                  className="text-sm me-4 md:text-base"
+                  type="button"
+                >
+                  {"Volver"}
+                </ButtonPro>
+              )}
+              {variantProductId && (
+                <ButtonPro
+                  disabled={loading}
+                  type="button"
+                  className="text-sm me-4 md:text-base bg-green-600 hover:bg-green-800"
+                  onClick={handleTable}
+                >
+                  Ver Valores
+                </ButtonPro>
+              )}
+              <ButtonPro disabled={loading} className="text-sm md:text-base">
+                {initialData ? "Actualizar" : "Agregar"} {"Producto"}
+              </ButtonPro>
+            </div>
+          </StickyFooterPanel>
         </form>
       </Form>
     </>

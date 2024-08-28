@@ -58,7 +58,6 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
   const toastMessage = initialData
     ? "Atributo Actualizado."
     : "Atributo Creado.";
-  const action = initialData ? "Guardar Cambios" : "Crear";
 
   const form = useForm<AttributeFormValues>({
     resolver: zodResolver(formSchema),
