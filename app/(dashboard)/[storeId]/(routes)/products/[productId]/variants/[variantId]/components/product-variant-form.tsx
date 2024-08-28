@@ -2,9 +2,9 @@
 
 import * as z from "zod";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
 import {
@@ -62,17 +62,16 @@ const formSchema = z.object({
     .optional()
     .nullable(),
   colorId: z.string().optional().nullable(),
-  // attributes: z
-  //   .array(
-  //     z
-  //       .object({
-  //         attributeId: z.string().min(1, { message: "Requerido" }),
-  //         attributeValueId: z.string().min(1, { message: "Requerido" }),
-  //       })
-  //       .required()
-  //   )
-  //   .array()
-  //   .min(1, { message: "Requerido" }),
+  attributes: z
+    .array(
+      z
+        .object({
+          attributeId: z.string().min(1, { message: "Requerido" }),
+          attributeValueId: z.string().min(1, { message: "Requerido" }),
+        })
+        .required()
+    )
+    .min(1, { message: "Requerido" }),
   images: z
     .object({ url: z.string() }, { message: "Requerido" })
     .array()
@@ -91,6 +90,7 @@ interface AttributeValue {
   createdAt: Date;
   updatedAt: Date;
 }
+
 interface Attribute {
   id: string;
   storeId: string;
@@ -133,12 +133,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
   const toastMessage = initialData
     ? "Variación de Producto Actualizada."
     : "Variación de Producto Creada.";
-  const action = initialData ? "Guardar Cambios" : "Crear";
-  const [variantProductId, setVariantProduct] = useState(initialData?.id || "");
-  const [attributeId, setAttributeId] = useState(initialData?.id || "");
-  const [valueattributeId, setValueAttributeId] = useState(
-    initialData?.id || ""
-  );
+
   const defaultValues = initialData
     ? {
         ...initialData,
@@ -155,7 +150,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
         name: "",
         sku: "",
         images: [],
-        attributes: [],
+        attributes: [{ attributeId: "", attributeValueId: "" }], // Default attribute
         price: 0,
         priceOffer: null,
         stock: null,
@@ -174,6 +169,11 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
     register,
     formState: { errors },
   } = form;
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "attributes",
+  });
+
   const isStock = form.watch("isStock");
   const isPriceOffer = form.watch("isPriceOffer");
   const isFeatured = form.watch("isFeatured");
@@ -182,11 +182,21 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(
     null
   );
-
-  const handleAttributeChange = (attributeId: string) => {
+  const [variantProductId, setVariantProduct] = useState(initialData?.id || "");
+  const [attributeId, setAttributeId] = useState(initialData?.id || "");
+  const [valueattributeId, setValueAttributeId] = useState(
+    initialData?.id || ""
+  );
+  const handleAttributeChange = (attributeId: string, index: number) => {
     setSelectedAttributeId(attributeId);
+
+    // Resetea el valor de `attributeValueId` cuando cambia el `attributeId`
+    form.setValue(`attributes.${index}.attributeValueId`, "");
+
+    // Actualiza el `attributeId` seleccionado
+    form.setValue(`attributes.${index}.attributeId`, attributeId);
   };
-  const handleTable = () => {
+  const handleViewTable = () => {
     router.push(`/${params.storeId}/products/${params.productId}/variants`);
   };
   useEffect(() => {
@@ -201,6 +211,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
     }
   }, [form.watch("isPriceOffer")]);
 
+  //?Funciones API
   const onSubmit = async (data: ProductVariantFormValues) => {
     try {
       setLoading(true);
@@ -254,6 +265,8 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
 
     return `${productName}-${variantName}`;
   };
+
+  //*Ver en consola los valores del formulario
   const watchValues = form.watch();
 
   useEffect(() => {
@@ -407,12 +420,13 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
               details={"Gestione los atributos de la variación de producto"}
               className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
             />
+
             <Card className="w-full sm:w-8/12 md:w-2/3">
               <FormField
                 control={form.control}
                 name="colorId"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="pb-4">
                     <FormLabel>Color</FormLabel>
                     <Select
                       disabled={loading}
@@ -440,7 +454,115 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
                   </FormItem>
                 )}
               />
-              {/* <FormField
+              <div>
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="py-5 border-b border-dashed border-border-200 last:border-0 md:py-8"
+                  >
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                      <FormField
+                        control={form.control}
+                        name={`attributes.${index}.attributeId`}
+                        render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>Atributo</FormLabel>
+                            <Select
+                              disabled={loading}
+                              value={field.value}
+                              defaultValue={field.value}
+                              onValueChange={(value) =>
+                                handleAttributeChange(value, index)
+                              }
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue
+                                    defaultValue={field.value}
+                                    placeholder="Seleccionar Atributo"
+                                  />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {attributes.map((attribute) => (
+                                  <SelectItem
+                                    key={attribute.id}
+                                    value={attribute.id}
+                                  >
+                                    {attribute.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {form.watch(`attributes.${index}.attributeId`) && (
+                        <>
+                          <FormItem>
+                            <FormLabel>Valores</FormLabel>
+                            <Select
+                              value={form.watch(
+                                `attributes.${index}.attributeValueId`
+                              )}
+                              onValueChange={(value) =>
+                                form.setValue(
+                                  `attributes.${index}.attributeValueId`,
+                                  value
+                                )
+                              }
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar Valor" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {attributes
+                                  .find(
+                                    (attr) =>
+                                      attr.id ===
+                                      form.watch(
+                                        `attributes.${index}.attributeId`
+                                      )
+                                  )
+                                  ?.values.map((value) => (
+                                    <SelectItem key={value.id} value={value.id}>
+                                      {value.value}
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        </>
+                      )}
+
+                      <button
+                        onClick={() => remove(index)}
+                        type="button"
+                        className="text-sm text-red-500 transition-colors duration-200 hover:text-red-700 focus:outline-none sm:col-span-1 sm:mt-4"
+                      >
+                        {"Eliminar"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <ButtonPro
+                type="button"
+                onClick={() =>
+                  append({
+                    attributeId: "",
+                    attributeValueId: "",
+                  })
+                }
+                className="w-full sm:w-auto"
+              >
+                {"Agregar"}
+              </ButtonPro>
+            </Card>
+            {/* <FormField
                 control={form.control}
                 name="attributeId"
                 render={({ field }) => (
@@ -509,7 +631,6 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
                   </div>
                 </>
               )} */}
-            </Card>
           </div>
           <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
             <Description
@@ -672,7 +793,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
                   disabled={loading}
                   type="button"
                   className="text-sm me-4 md:text-base bg-green-600 hover:bg-green-800"
-                  onClick={handleTable}
+                  onClick={handleViewTable}
                 >
                   Ver Valores
                 </ButtonPro>

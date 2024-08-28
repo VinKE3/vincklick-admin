@@ -205,7 +205,6 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                         // @ts-ignore
                         error={errors?.values?.[index]?.value?.message}
                       />
-
                       <button
                         onClick={() => remove(index)}
                         type="button"
@@ -217,7 +216,6 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                   </div>
                 ))}
               </div>
-
               <ButtonPro
                 type="button"
                 onClick={() => append({ value: "" })}
