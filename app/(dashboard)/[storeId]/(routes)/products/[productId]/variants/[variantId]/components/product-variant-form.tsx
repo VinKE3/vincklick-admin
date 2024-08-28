@@ -2,7 +2,7 @@
 
 import * as z from "zod";
 import axios from "axios";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -150,8 +150,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
         name: "",
         sku: "",
         images: [],
-        attributes: [{ attributeId: "", attributeValueId: "" }], // Default attribute
-        price: 0,
+        attributes: [{ attributeId: "", attributeValueId: "" }],
         priceOffer: null,
         stock: null,
         isStock: false,
@@ -189,11 +188,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
   );
   const handleAttributeChange = (attributeId: string, index: number) => {
     setSelectedAttributeId(attributeId);
-
-    // Resetea el valor de `attributeValueId` cuando cambia el `attributeId`
     form.setValue(`attributes.${index}.attributeValueId`, "");
-
-    // Actualiza el `attributeId` seleccionado
     form.setValue(`attributes.${index}.attributeId`, attributeId);
   };
   const handleViewTable = () => {
@@ -221,10 +216,13 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
           data
         );
       } else {
-        await axios.post(`/api/${params.storeId}/products`, data);
+        await axios.post(
+          `/api/${params.storeId}/products/${params.productId}/variants`,
+          data
+        );
       }
       router.refresh();
-      router.push(`/${params.storeId}/products`);
+      router.push(`/${params.storeId}/products/${params.productId}/variants`);
       router.refresh();
       toast.success(toastMessage);
     } catch (error: any) {
@@ -562,75 +560,6 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
                 {"Agregar"}
               </ButtonPro>
             </Card>
-            {/* <FormField
-                control={form.control}
-                name="attributeId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Atributo</FormLabel>
-                    <Select
-                      disabled={loading}
-                      value={field.value}
-                      defaultValue={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        handleAttributeChange(value);
-                      }}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue
-                            defaultValue={field.value}
-                            placeholder="Seleccionar Atributo"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {attributes.map((attribute) => (
-                          <SelectItem key={attribute.id} value={attribute.id}>
-                            {attribute.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {selectedAttributeId && (
-                <>
-                  <FormItem>
-                    <FormLabel>Valores</FormLabel>
-                    <Select
-                      value={form.watch("attributeValueId")}
-                      onValueChange={(value) =>
-                        form.setValue("attributeValueId", value)
-                      }
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue
-                            defaultValue={form.watch("attributeValueId")}
-                            placeholder="Seleccionar Valor"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {attributes
-                          ?.find((attr) => attr.id === selectedAttributeId)
-                          ?.values.map((value) => (
-                            <SelectItem key={value.id} value={value.id}>
-                              {value.value}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                  <div className="mt-8">
-                    <ButtonPro type="button">Agregar nuevo atributo</ButtonPro>
-                  </div>
-                </>
-              )} */}
           </div>
           <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base ">
             <Description
@@ -778,16 +707,15 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
           </div>
           <StickyFooterPanel className="z-0">
             <div className="text-end space-y-2">
-              {initialData && (
-                <ButtonPro
-                  variant="outline"
-                  onClick={router.back}
-                  className="text-sm me-4 md:text-base"
-                  type="button"
-                >
-                  {"Volver"}
-                </ButtonPro>
-              )}
+              <ButtonPro
+                variant="outline"
+                onClick={router.back}
+                className="text-sm me-4 md:text-base"
+                type="button"
+              >
+                {"Volver"}
+              </ButtonPro>
+
               {variantProductId && (
                 <ButtonPro
                   disabled={loading}
@@ -795,7 +723,7 @@ export const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
                   className="text-sm me-4 md:text-base bg-green-600 hover:bg-green-800"
                   onClick={handleViewTable}
                 >
-                  Ver Valores
+                  Ver Tabla
                 </ButtonPro>
               )}
               <ButtonPro disabled={loading} className="text-sm md:text-base">

@@ -31,7 +31,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onConfirm = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/productsVariants/${data.id}`);
+      await axios.delete(
+        `/api/${params.storeId}/products/${params.productId}/variants/${data.id}`
+      );
       toast.success("Variación de Producto Eliminado.");
       router.refresh();
     } catch (error) {
@@ -69,7 +71,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
-              router.push(`/${params.storeId}/productsVariants/${data.id}`)
+              router.push(
+                `/${params.storeId}/products/${params.productId}/variants/${data.id}`
+              )
             }
           >
             <Edit className="mr-2 h-4 w-4" /> Editar

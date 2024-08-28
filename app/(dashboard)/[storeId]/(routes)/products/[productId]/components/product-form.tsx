@@ -235,7 +235,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   const handleCreateVariants = () => {
-    router.push(`/${params.storeId}/products/${productId}/variants/new`);
+    router.push(`/${params.storeId}/products/${productId}/variants`);
   };
 
   const watchValues = form.watch();
