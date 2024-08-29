@@ -124,7 +124,6 @@ export async function PATCH(
 ) {
   try {
     const { userId } = auth();
-
     const body = await req.json();
 
     const {
@@ -138,6 +137,7 @@ export async function PATCH(
       isArchived,
       stock,
       isStock,
+      colorId,
       attributes,
     } = body;
 
@@ -167,6 +167,10 @@ export async function PATCH(
       return new NextResponse("Imagenes son requeridas", { status: 400 });
     }
 
+    if (!attributes || !attributes.length) {
+      return new NextResponse("Atributos son requeridos", { status: 400 });
+    }
+
     if (!price) {
       return new NextResponse("Precio es requerido", { status: 400 });
     }
@@ -182,6 +186,7 @@ export async function PATCH(
       return new NextResponse("No autorizado", { status: 405 });
     }
 
+    // Update the product variant basic details
     await prismadb.productVariant.update({
       where: {
         id: params.variantId,
@@ -196,25 +201,45 @@ export async function PATCH(
         isArchived,
         isStock,
         stock,
+        colorId,
         storeId: params.storeId,
         images: {
+          deleteMany: {},
+        },
+        attributes: {
           deleteMany: {},
         },
       },
     });
 
+    // Add the new attributes
+    if (attributes && Array.isArray(attributes)) {
+      await prismadb.variantAttribute.createMany({
+        data: attributes.map((attr: any) => ({
+          attributeId: attr.attributeId,
+          attributeValueId: attr.attributeValueId,
+          productVariantId: params.variantId,
+          storeId: params.storeId,
+        })),
+      });
+    }
+
+    // Update images with the new set of images
     const productVariant = await prismadb.productVariant.update({
       where: {
-        id: params.productId,
+        id: params.variantId,
       },
       data: {
         images: {
           createMany: {
-            data: [...images.map((image: { url: string }) => image)],
+            data: [
+              ...images.map((image: { url: string }) => ({ url: image.url })),
+            ],
           },
         },
       },
     });
+
     return NextResponse.json(productVariant);
   } catch (error) {
     console.log("[PRODUCT_PATCH]", error);
